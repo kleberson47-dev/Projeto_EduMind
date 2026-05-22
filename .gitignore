@@ -28,6 +28,7 @@ backend/dump.rdb
 
 backend/*.log
 backend/logs/
+REGRAS_DESENVOLVIMENTO.md
 
 
 # --- FRONT-END ---
@@ -52,3 +53,4 @@ frontend/edumind_frontend/.env.production.local
 
 frontend/edumind_frontend/.vite/
 frontend/edumind_frontend/.tsbuildinfo
+REGRAS_DESENVOLVIMENTO_FRONTEND.md
