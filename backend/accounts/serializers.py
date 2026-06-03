@@ -7,7 +7,7 @@ from .models import User, UserRole
 
 class UserSerializer(serializers.ModelSerializer):
     senha = serializers.CharField(
-        write_only=True, required=True, source="password")
+        write_only=True, required=False, source="password")
 
     class Meta:
         model = User
@@ -31,7 +31,22 @@ class UserSerializer(serializers.ModelSerializer):
         return value
 
     def validate_email(self, value):
-        return value.strip().lower()
+        email = value.strip().lower()
+        query = User.objects.filter(email=email)
+        if self.instance:
+            query = query.exclude(pk=self.instance.pk)
+        if query.exists():
+            raise serializers.ValidationError("Email ja cadastrado.")
+        return email
+
+    def validate_nome(self, value):
+        nome = value.strip()
+        query = User.objects.filter(nome=nome)
+        if self.instance:
+            query = query.exclude(pk=self.instance.pk)
+        if query.exists():
+            raise serializers.ValidationError("Nome ja cadastrado.")
+        return nome
 
     def validate_senha(self, value):
         if len(value) < 8:
@@ -53,7 +68,11 @@ class UserSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
-        password = validated_data.pop("password")
+        password = validated_data.pop("password", None)
+        if not password:
+            raise serializers.ValidationError(
+                {"senha": "Este campo e obrigatorio."}
+            )
         user = User(**validated_data)
         user.set_password(password)
         user.save()
