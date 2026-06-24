@@ -54,3 +54,4 @@ frontend/edumind_frontend/.env.production.local
 frontend/edumind_frontend/.vite/
 frontend/edumind_frontend/.tsbuildinfo
 REGRAS_DESENVOLVIMENTO_FRONTEND.md
+requisitos_projeto.md

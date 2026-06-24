@@ -1,3 +1,42 @@
+:root {
+  --text: #5f6980;
+  --text-h: #0f172a;
+  --bg: #e8f4ff;
+  --border: #d7deea;
+  --sans: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
+  --heading: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
+  font: 16px/1.5 var(--sans);
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+}
+
 .login-page {
   min-height: 100svh;
   display: grid;
