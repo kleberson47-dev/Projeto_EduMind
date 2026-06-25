@@ -1,9 +1,5 @@
-import type { ReactNode } from 'react'
+import { Outlet } from 'react-router-dom'
 
-interface BaseLayoutProps {
-  children?: ReactNode
-}
-
-export function BaseLayout({ children }: BaseLayoutProps) {
-  return children ?? null
+export function BaseLayout() {
+  return <Outlet />
 }

@@ -1,7 +1,9 @@
-import { LoginPage } from './content/pages/Login'
+import { RouterProvider } from 'react-router-dom'
+
+import { appRouter } from './router'
 
 function App() {
-  return <LoginPage />
+  return <RouterProvider router={appRouter} />
 }
 
 export default App

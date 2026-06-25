@@ -1,9 +1,5 @@
-import type { ReactNode } from 'react'
+import { Outlet } from 'react-router-dom'
 
-interface SidebarLayoutProps {
-  children?: ReactNode
-}
-
-export function SidebarLayout({ children }: SidebarLayoutProps) {
-  return children ?? null
+export function SidebarLayout() {
+  return <Outlet />
 }
