@@ -4,6 +4,8 @@ import { Navigate, createBrowserRouter } from 'react-router-dom'
 
 import { SuspenseLoader } from './components/SuspenseLoader/index'
 import { BaseLayout } from './layouts/BaseLayout'
+import { SidebarLayout } from './layouts/SidebarLayout'
+import { AuthMiddleware } from './middlewares/AuthMiddleware'
 
 function loader<T extends object>(Component: ComponentType<T>) {
   return function LoadedComponent(props: T) {
@@ -24,6 +26,7 @@ const LoginPage = loader(
 )
 const CriarContaPage = loader(lazy(() => import('./content/pages/CriarConta')))
 const EsqueceuSenhaPage = loader(lazy(() => import('./content/pages/EsqueceuSenha')))
+const IndexPage = loader(lazy(() => import('./content/pages/Index')))
 
 export const appRouter = createBrowserRouter([
   {
@@ -45,6 +48,20 @@ export const appRouter = createBrowserRouter([
       {
         path: 'esqueceu-senha',
         element: <EsqueceuSenhaPage />,
+      },
+      {
+        path: 'app',
+        element: (
+          <AuthMiddleware>
+            <SidebarLayout />
+          </AuthMiddleware>
+        ),
+        children: [
+          {
+            index: true,
+            element: <IndexPage />,
+          },
+        ],
       },
       {
         path: '*',

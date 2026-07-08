@@ -373,6 +373,24 @@ a {
   filter: saturate(1.05);
 }
 
+.submit-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+  transform: none;
+  box-shadow: 0 12px 24px rgba(10, 111, 204, 0.2);
+}
+
+.form-error-message {
+  margin: 0.2rem 0 0;
+  padding: 0.7rem 0.85rem;
+  border-radius: 0.75rem;
+  border: 1px solid #f3b4b4;
+  background: #fff1f1;
+  color: #ab1f1f;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
 .submit-button:focus-visible,
 .password-toggle:focus-visible,
 .field-head a:focus-visible,

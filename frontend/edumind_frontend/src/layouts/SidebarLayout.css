@@ -1,0 +1,43 @@
+.sidebar-layout {
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.sidebar-layout__topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 4.5rem;
+  padding: 0 1rem;
+  color: #ffffff;
+  background: linear-gradient(120deg, #0b6bcf 0%, #08a6c7 100%);
+}
+
+.sidebar-layout__brand {
+  margin: 0;
+  font-size: 1.1rem;
+  letter-spacing: -0.02em;
+}
+
+.sidebar-layout__nav {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.sidebar-layout__nav a {
+  color: rgba(255, 255, 255, 0.88);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.sidebar-layout__nav a.active {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.sidebar-layout__content {
+  min-height: 0;
+}

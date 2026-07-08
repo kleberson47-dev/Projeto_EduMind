@@ -1,5 +1,11 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+
+import { consumeRedirectAfterLogin, setAuthSession } from '../../features/auth'
+import { login } from '../../services'
+import { ApiRequestError } from '../../utils/requests'
+
 import './Login.css'
 
 interface LoginFeature {
@@ -28,14 +34,35 @@ const loginFeatures: LoginFeature[] = [
 ]
 
 function LoginPage() {
+  const navigate = useNavigate()
+  const location = useLocation()
   const currentYear = new Date().getFullYear()
   const [formState, setFormState] = useState<LoginFormState>({
     email: '',
     password: '',
   })
   const [showPassword, setShowPassword] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  const redirectFromLocation = useMemo(() => {
+    const state = location.state as { from?: { pathname?: string } | string } | null
+    if (!state?.from) {
+      return null
+    }
+
+    if (typeof state.from === 'string') {
+      return state.from
+    }
+
+    return state.from.pathname ?? null
+  }, [location.state])
 
   const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (errorMessage) {
+      setErrorMessage(null)
+    }
+
     setFormState((currentState) => ({
       ...currentState,
       email: event.target.value,
@@ -43,14 +70,45 @@ function LoginPage() {
   }
 
   const handlePasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (errorMessage) {
+      setErrorMessage(null)
+    }
+
     setFormState((currentState) => ({
       ...currentState,
       password: event.target.value,
     }))
   }
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+
+    if (isSubmitting) {
+      return
+    }
+
+    try {
+      setIsSubmitting(true)
+      setErrorMessage(null)
+
+      const tokens = await login({
+        email: formState.email.trim().toLowerCase(),
+        password: formState.password,
+      })
+
+      setAuthSession(tokens)
+
+      const redirectPath = consumeRedirectAfterLogin() ?? redirectFromLocation ?? '/app'
+      navigate(redirectPath, { replace: true })
+    } catch (error) {
+      if (error instanceof ApiRequestError) {
+        setErrorMessage(error.message)
+      } else {
+        setErrorMessage('Nao foi possivel realizar login. Tente novamente.')
+      }
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -139,9 +197,7 @@ function LoginPage() {
             <label className="field">
               <div className="field-head">
                 <span>Senha</span>
-                <a href="/" onClick={(event) => event.preventDefault()}>
-                  Esqueceu?
-                </a>
+                <Link to="/esqueceu-senha">Esqueceu?</Link>
               </div>
               <div className="input-shell">
                 <span className="input-icon" aria-hidden="true">
@@ -176,16 +232,16 @@ function LoginPage() {
               </div>
             </label>
 
-            <button type="submit" className="submit-button">
-              Entrar
+            {errorMessage && <p className="form-error-message">{errorMessage}</p>}
+
+            <button type="submit" className="submit-button" disabled={isSubmitting}>
+              {isSubmitting ? 'Entrando...' : 'Entrar'}
             </button>
           </form>
 
           <p className="signup-text">
             Novo na Edumind?{' '}
-            <a href="/" onClick={(event) => event.preventDefault()}>
-              Criar conta
-            </a>
+            <Link to="/criar-conta">Criar conta</Link>
           </p>
         </div>
 
