@@ -1,8 +1,16 @@
 import re
 
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from .models import User, UserRole
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    default_error_messages = {
+        **TokenObtainPairSerializer.default_error_messages,
+        "no_active_account": "E-mail ou senha inválidos.",
+    }
 
 
 class UserSerializer(serializers.ModelSerializer):

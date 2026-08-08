@@ -54,7 +54,7 @@ export async function requestJson<T>(
 	if (!response.ok) {
 		const message =
 			(responseData as { detail?: string } | null)?.detail ??
-			'Nao foi possivel completar a requisicao.'
+			'Informe Email ou Senha.'
 
 		throw new ApiRequestError(message, response.status, responseData)
 	}
