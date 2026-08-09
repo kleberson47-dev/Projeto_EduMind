@@ -38,10 +38,17 @@ export async function getCurrentUser(token: string): Promise<User> {
   })
 }
 
-export async function createUser(payload: CreateUserRequest): Promise<User> {
+export async function createUser(
+  payload: CreateUserRequest,
+): Promise<User> {
   return requestJson<User>(API_ENDPOINTS.accounts.criarUsuario, {
     method: 'POST',
-    body: buildUserFormData(payload),
+    body: {
+      nome: payload.nome,
+      email: payload.email,
+      senha: payload.senha,
+      role: payload.role,
+    },
   })
 }
 

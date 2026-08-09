@@ -5,6 +5,7 @@ backend/env/
 backend/ENV/
 backend/env.bak/
 backend/venv.bak/
+backend/accounts/tests.py
 
 backend/__pycache__/
 backend/*.py[cod]

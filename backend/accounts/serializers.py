@@ -14,6 +14,10 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    role = serializers.ChoiceField(
+        choices=UserRole.choices,
+        error_messages={"invalid_choice": "Escolha entre aluno ou professor"},
+    )
     senha = serializers.CharField(
         write_only=True, required=False, source="password")
 
@@ -35,7 +39,8 @@ class UserSerializer(serializers.ModelSerializer):
     def validate_role(self, value):
         valid_roles = {choice[0] for choice in UserRole.choices}
         if value not in valid_roles:
-            raise serializers.ValidationError("Role invalida.")
+            raise serializers.ValidationError(
+                "Escolha entre aluno ou professor")
         return value
 
     def validate_email(self, value):
@@ -79,7 +84,7 @@ class UserSerializer(serializers.ModelSerializer):
         password = validated_data.pop("password", None)
         if not password:
             raise serializers.ValidationError(
-                {"senha": "Este campo e obrigatorio."}
+                {"senha": "Este campo é obrigatorio."}
             )
         user = User(**validated_data)
         user.set_password(password)

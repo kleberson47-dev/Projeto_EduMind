@@ -1,0 +1,100 @@
+@import './Login.css';
+
+.create-account-page .login-brand-panel {
+  background:
+    linear-gradient(145deg, rgba(3, 76, 140, 0.95) 0%, rgba(2, 99, 160, 0.94) 52%, rgba(7, 132, 169, 0.98) 100%);
+}
+
+.create-account-form-panel {
+  gap: 1rem;
+}
+
+.create-account-card {
+  width: min(100%, 26rem);
+  padding: 1.5rem;
+}
+
+.create-account-card .login-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.create-account-card .field {
+  display: grid;
+  gap: 0.45rem;
+  color: #0f172a;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.create-account-card .input-shell {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.9rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  background: #f8fbff;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+
+.create-account-card .input-shell:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.14);
+}
+
+.create-account-card .input-shell input,
+.create-account-card .input-shell select {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  color: #0f172a;
+  outline: none;
+}
+
+.create-account-card .input-shell select {
+  appearance: none;
+}
+
+.create-account-card .submit-button {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.95rem 1.1rem;
+  background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+  box-shadow: 0 14px 30px rgba(37, 99, 235, 0.22);
+}
+
+.create-account-card .submit-button:hover {
+  transform: translateY(-1px);
+}
+
+.form-feedback-message {
+  margin: 0;
+  padding: 0.8rem 0.9rem;
+  border-radius: 0.85rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.form-feedback-message--error {
+  border: 1px solid #f3b4b4;
+  background: #fff1f1;
+  color: #ab1f1f;
+}
+
+.form-feedback-message--success {
+  border: 1px solid #b7e7cc;
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.account-helper-text {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: #64748b;
+}
