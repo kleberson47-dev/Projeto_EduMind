@@ -40,6 +40,10 @@ export default function IndexPage() {
     navigate('/login', { replace: true })
   }
 
+  const handleEditProfile = () => {
+    navigate('/app/editar-perfil')
+  }
+
   return (
     <section className="index-page" aria-label="Tela inicial do sistema">
       <header className="index-header">
@@ -50,7 +54,12 @@ export default function IndexPage() {
       </header>
 
       <article className="index-card">
-        <h2>Bem-vindo ao EduMind</h2>
+        <div className="index-card-header">
+          <h2>Bem-vindo ao EduMind</h2>
+          <button type="button" className="edit-button" onClick={handleEditProfile}>
+            Editar
+          </button>
+        </div>
 
         {isLoading && <p>Carregando dados da conta...</p>}
 

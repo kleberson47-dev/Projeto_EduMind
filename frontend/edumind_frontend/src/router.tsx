@@ -27,6 +27,7 @@ const LoginPage = loader(
 const CriarContaPage = loader(lazy(() => import('./content/pages/CriarConta')))
 const EsqueceuSenhaPage = loader(lazy(() => import('./content/pages/EsqueceuSenha')))
 const IndexPage = loader(lazy(() => import('./content/pages/Index')))
+const EditarPerfilPage = loader(lazy(() => import('./content/pages/EditarPerfil')))
 
 export const appRouter = createBrowserRouter([
   {
@@ -60,6 +61,10 @@ export const appRouter = createBrowserRouter([
           {
             index: true,
             element: <IndexPage />,
+          },
+          {
+            path: 'editar-perfil',
+            element: <EditarPerfilPage />,
           },
         ],
       },

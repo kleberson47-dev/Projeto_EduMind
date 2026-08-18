@@ -11,6 +11,7 @@ export function SidebarLayout() {
           <NavLink to="/app" end>
             Inicio
           </NavLink>
+          <NavLink to="/app/editar-perfil">Editar perfil</NavLink>
         </nav>
       </header>
       <main className="sidebar-layout__content">
