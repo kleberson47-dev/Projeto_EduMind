@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 import type { User } from '../../models'
 import { getCurrentUser } from '../../services'
-import { getAccessToken } from '../../features/auth'
+import { clearAuthSession, getAccessToken } from '../../features/auth'
 
 import './DashboardAluno.css'
 
@@ -90,6 +91,7 @@ function formatRole(role: User['role']): string {
 }
 
 export default function DashboardAlunoPage() {
+  const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const [user, setUser] = useState<User | null>(null)
 
@@ -103,13 +105,30 @@ export default function DashboardAlunoPage() {
       try {
         const profile = await getCurrentUser(token)
         setUser(profile)
+
+        if (profile.role !== 'aluno') {
+          navigate('/app/editar-perfil', { replace: true })
+        }
       } catch {
         // ignorado intencionalmente: a página continua mesmo sem dados do usuário
       }
     }
 
     void loadCurrentUser()
-  }, [])
+  }, [navigate])
+
+  const handleLogout = () => {
+    clearAuthSession()
+    navigate('/login', { replace: true })
+  }
+
+  const handleOpenConfig = () => {
+    navigate('/app/editar-perfil')
+  }
+
+  if (user && user.role !== 'aluno') {
+    return null
+  }
 
   const displayName = user?.nome ?? 'Usuário'
   const firstName = displayName.split(' ')[0] ?? 'Usuário'
@@ -175,15 +194,15 @@ export default function DashboardAlunoPage() {
                 <div className="profile-menu-role">{profileRole}</div>
               </div>
 
-              <div className="profile-menu-item">
+              <button type="button" className="profile-menu-item" onClick={handleOpenConfig}>
                 <span className="profile-menu-icon">⚙</span>
                 <span>Configurações</span>
-              </div>
+              </button>
 
-              <div className="profile-menu-item danger">
+              <button type="button" className="profile-menu-item danger" onClick={handleLogout}>
                 <span className="profile-menu-icon">↩</span>
                 <span>Sair</span>
-              </div>
+              </button>
             </div>
           )}
 

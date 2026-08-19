@@ -226,6 +226,7 @@
   box-shadow: 0 10px 26px rgba(40, 71, 101, 0.18);
   padding: 12px 12px 10px;
   color: #1f2d3e;
+  z-index: 3;
 }
 
 .profile-menu-head {
@@ -246,12 +247,25 @@
 }
 
 .profile-menu-item {
+  width: 100%;
   padding: 10px 8px 0;
   display: flex;
   align-items: center;
   gap: 8px;
   font-weight: 600;
   color: #1d2d3d;
+  background: transparent;
+  border: none;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  outline: none;
+}
+
+.profile-menu-item:hover {
+  background: rgba(12, 141, 222, 0.04);
 }
 
 .profile-menu-icon {
