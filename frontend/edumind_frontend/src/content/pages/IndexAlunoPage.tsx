@@ -5,7 +5,7 @@ import type { User } from '../../models'
 import { getCurrentUser } from '../../services'
 import { clearAuthSession, getAccessToken } from '../../features/auth'
 
-import './DashboardAluno.css'
+import './IndexAlunoPage.css'
 
 type NavItem = {
   label: string
@@ -90,7 +90,7 @@ function formatRole(role: User['role']): string {
   return 'Usuário'
 }
 
-export default function DashboardAlunoPage() {
+export default function IndexAlunoPage() {
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const [user, setUser] = useState<User | null>(null)
