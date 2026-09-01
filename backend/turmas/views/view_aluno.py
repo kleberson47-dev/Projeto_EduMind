@@ -2,42 +2,27 @@ from django.core.exceptions import ValidationError
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 
-from .models import Classroom
-from .services import listar_turmas_do_aluno, matricular_aluno_por_codigo
-from .serializers import (
-    ClassroomCreateSerializer,
-    ClassroomDetailSerializer,
-    ClassroomListSerializer,
-    JoinClassroomSerializer,
-)
+from ..models import Classroom
+from ..serializers import ClassroomDetailSerializer, ClassroomListSerializer, JoinClassroomSerializer
+from ..services import listar_turmas_do_aluno, matricular_aluno_por_codigo
 
 
-class ClassroomListView(generics.ListCreateAPIView):
+# Lista as turmas em que o aluno está matriculado e ativo.
+class AlunoClassroomListView(generics.ListAPIView):
+    serializer_class = ClassroomListSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_serializer_class(self):
-        if self.request.method == "POST":
-            return ClassroomCreateSerializer
-        return ClassroomListSerializer
-
     def get_queryset(self):
-        if getattr(self.request.user, "role", None) == "professor":
-            return Classroom.objects.filter(professor=self.request.user).order_by("nome")
         return listar_turmas_do_aluno(self.request.user)
 
-    def perform_create(self, serializer):
-        serializer.save()
 
-
-class ClassroomDetailView(generics.RetrieveAPIView):
+# Exibe os detalhes de uma turma específica para o aluno matriculado.
+class AlunoClassroomDetailView(generics.RetrieveAPIView):
     serializer_class = ClassroomDetailSerializer
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = "id"
 
     def get_queryset(self):
-        if getattr(self.request.user, "role", None) == "professor":
-            return Classroom.objects.filter(professor=self.request.user).distinct()
-
         return Classroom.objects.filter(
             enrollments__aluno=self.request.user,
             enrollments__ativo=True,
@@ -45,6 +30,7 @@ class ClassroomDetailView(generics.RetrieveAPIView):
         ).distinct()
 
 
+# Permite que o aluno entre em uma turma usando o código de acesso.
 class JoinClassroomView(generics.GenericAPIView):
     serializer_class = JoinClassroomSerializer
     permission_classes = [permissions.IsAuthenticated]
