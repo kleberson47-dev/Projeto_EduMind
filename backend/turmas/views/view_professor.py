@@ -3,7 +3,12 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 
 from ..models import Classroom
-from ..serializers import ClassroomCreateSerializer, ClassroomDetailSerializer, ClassroomListSerializer
+from ..serializers import (
+    ClassroomCreateSerializer,
+    ClassroomDetailSerializer,
+    ClassroomListSerializer,
+    ClassroomUpdateSerializer,
+)
 from ..services import listar_turmas_do_aluno
 
 
@@ -35,17 +40,25 @@ class ProfessorClassroomListCreateView(generics.ListCreateAPIView):
         return super().post(request, *args, **kwargs)
 
 
-# Exibe os detalhes de uma turma específica pertencente ao professor.
-class ProfessorClassroomDetailView(generics.RetrieveAPIView):
-    serializer_class = ClassroomDetailSerializer
+# Exibe e atualiza os dados básicos de uma turma específica pertencente ao professor.
+class ProfessorClassroomDetailView(generics.RetrieveUpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = "id"
+
+    def get_serializer_class(self):
+        if self.request.method in ["PATCH", "PUT"]:
+            return ClassroomUpdateSerializer
+        return ClassroomDetailSerializer
 
     def get_queryset(self):
         if getattr(self.request.user, "role", None) == "professor":
             return Classroom.objects.filter(professor=self.request.user).distinct()
-        return Classroom.objects.filter(
-            enrollments__aluno=self.request.user,
-            enrollments__ativo=True,
-            ativo=True,
-        ).distinct()
+        return Classroom.objects.none()
+
+    def update(self, request, *args, **kwargs):
+        if getattr(request.user, "role", None) != "professor":
+            return Response(
+                {"detail": "Apenas professores podem atualizar turmas."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        return super().update(request, *args, **kwargs)

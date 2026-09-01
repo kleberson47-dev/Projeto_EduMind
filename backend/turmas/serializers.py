@@ -98,6 +98,24 @@ class ClassroomDetailSerializer(serializers.ModelSerializer):
         ]
 
 
+class ClassroomUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Classroom
+        fields = [
+            "nome",
+            "descricao",
+            "criterios_avaliacao",
+            "regras",
+            "ativo",
+        ]
+
+    def validate_nome(self, value):
+        nome = value.strip()
+        if not nome:
+            raise serializers.ValidationError("O nome da turma é obrigatório.")
+        return nome
+
+
 class JoinClassroomSerializer(serializers.Serializer):
     codigo_acesso = serializers.CharField(max_length=30)
 
