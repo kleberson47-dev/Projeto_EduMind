@@ -73,6 +73,7 @@ class ClassroomListSerializer(serializers.ModelSerializer):
 
 class ClassroomDetailSerializer(serializers.ModelSerializer):
     professor = ProfessorResumoSerializer(read_only=True)
+    numero_alunos = serializers.SerializerMethodField()
 
     class Meta:
         model = Classroom
@@ -84,6 +85,7 @@ class ClassroomDetailSerializer(serializers.ModelSerializer):
             "criterios_avaliacao",
             "regras",
             "professor",
+            "numero_alunos",
             "ativo",
             "created_at",
             "updated_at",
@@ -92,10 +94,14 @@ class ClassroomDetailSerializer(serializers.ModelSerializer):
             "id",
             "codigo_acesso",
             "professor",
+            "numero_alunos",
             "ativo",
             "created_at",
             "updated_at",
         ]
+
+    def get_numero_alunos(self, obj):
+        return obj.enrollments.filter(ativo=True).count()
 
 
 class ClassroomUpdateSerializer(serializers.ModelSerializer):
