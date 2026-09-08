@@ -2,8 +2,13 @@ from django.core.exceptions import ValidationError
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 
-from ..models import Classroom
-from ..serializers import ClassroomDetailSerializer, ClassroomListSerializer, JoinClassroomSerializer
+from ..models import Activity, Classroom
+from ..serializers import (
+    ActivitySerializer,
+    ClassroomDetailSerializer,
+    ClassroomListSerializer,
+    JoinClassroomSerializer,
+)
 from ..services import listar_turmas_do_aluno, matricular_aluno_por_codigo
 
 
@@ -55,3 +60,17 @@ class JoinClassroomView(generics.GenericAPIView):
             },
             status=status.HTTP_201_CREATED,
         )
+
+
+# Lista as atividades de uma turma em que o aluno está matriculado.
+class AlunoClassroomActivityListView(generics.ListAPIView):
+    serializer_class = ActivitySerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Activity.objects.filter(
+            turma_id=self.kwargs.get("id"),
+            turma__enrollments__aluno=self.request.user,
+            turma__enrollments__ativo=True,
+            ativo=True,
+        ).distinct().order_by("data_entrega", "-created_at")

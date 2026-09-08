@@ -34,6 +34,42 @@ class Classroom(models.Model):
             raise ValidationError("Nome da turma é obrigatório.")
 
 
+# Representa uma atividade ou tarefa vinculada a uma turma.
+class Activity(models.Model):
+    turma = models.ForeignKey(
+        Classroom,
+        on_delete=models.CASCADE,
+        related_name="atividades",
+    )
+    titulo = models.CharField(max_length=255)
+    descricao = models.TextField(blank=True, default="")
+    tipo = models.CharField(
+        max_length=50,
+        default="atividade",
+        choices=[
+            ("atividade", "Atividade"),
+            ("trabalho", "Trabalho"),
+            ("prova", "Prova"),
+            ("material", "Material"),
+        ],
+    )
+    data_entrega = models.DateField(blank=True, null=True)
+    ativo = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["data_entrega", "-created_at"]
+        db_table = "activities"
+
+    def __str__(self):
+        return f"{self.turma.nome} - {self.titulo}"
+
+    def clean(self):
+        if not self.titulo:
+            raise ValidationError("Título da atividade é obrigatório.")
+
+
 # Relaciona um aluno a uma turma e controla se a matrícula está ativa.
 class Enrollment(models.Model):
     aluno = models.ForeignKey(

@@ -1,12 +1,13 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from .models import Classroom
+from .models import Activity, Classroom
 from .services import criar_turma_para_professor
 
 User = get_user_model()
 
 
+# Serializa os dados básicos do professor para uso em respostas de turma.
 class ProfessorResumoSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -14,6 +15,7 @@ class ProfessorResumoSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "nome", "email"]
 
 
+# Valida e cria uma nova turma pelo professor autenticado.
 class ClassroomCreateSerializer(serializers.ModelSerializer):
     professor = ProfessorResumoSerializer(read_only=True)
 
@@ -52,6 +54,7 @@ class ClassroomCreateSerializer(serializers.ModelSerializer):
         )
 
 
+# Lista as turmas em formato resumido para listagens do professor ou do aluno.
 class ClassroomListSerializer(serializers.ModelSerializer):
     professor_nome = serializers.SerializerMethodField()
 
@@ -71,6 +74,7 @@ class ClassroomListSerializer(serializers.ModelSerializer):
         return obj.professor.nome
 
 
+# Expõe os detalhes completos de uma turma para o aluno ou professor.
 class ClassroomDetailSerializer(serializers.ModelSerializer):
     professor = ProfessorResumoSerializer(read_only=True)
     numero_alunos = serializers.SerializerMethodField()
@@ -104,6 +108,7 @@ class ClassroomDetailSerializer(serializers.ModelSerializer):
         return obj.enrollments.filter(ativo=True).count()
 
 
+# Permite atualizar os dados básicos da turma pelo professor.
 class ClassroomUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Classroom
@@ -122,6 +127,39 @@ class ClassroomUpdateSerializer(serializers.ModelSerializer):
         return nome
 
 
+# Serializa as atividades da turma e valida o conteúdo mínimo para criação.
+class ActivitySerializer(serializers.ModelSerializer):
+    turma = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = Activity
+        fields = [
+            "id",
+            "turma",
+            "titulo",
+            "descricao",
+            "tipo",
+            "data_entrega",
+            "ativo",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = [
+            "id",
+            "turma",
+            "created_at",
+            "updated_at",
+        ]
+
+    def validate_titulo(self, value):
+        titulo = value.strip()
+        if not titulo:
+            raise serializers.ValidationError(
+                "O título da atividade é obrigatório.")
+        return titulo
+
+
+# Valida o código de acesso usado para o aluno entrar em uma turma.
 class JoinClassroomSerializer(serializers.Serializer):
     codigo_acesso = serializers.CharField(max_length=30)
 
