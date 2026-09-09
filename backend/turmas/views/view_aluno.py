@@ -2,13 +2,14 @@ from django.core.exceptions import ValidationError
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 
-from ..models import Activity, Classroom
-from ..serializers import (
-    ActivitySerializer,
+from ..models import Activity, Classroom, Grade
+from ..serializers.activity_serializers import ActivitySerializer
+from ..serializers.classroom_serializers import (
     ClassroomDetailSerializer,
     ClassroomListSerializer,
     JoinClassroomSerializer,
 )
+from ..serializers.grade_serializers import GradeSerializer
 from ..services import listar_turmas_do_aluno, matricular_aluno_por_codigo
 
 
@@ -74,3 +75,18 @@ class AlunoClassroomActivityListView(generics.ListAPIView):
             turma__enrollments__ativo=True,
             ativo=True,
         ).distinct().order_by("data_entrega", "-created_at")
+
+
+# Lista as notas de um aluno em uma turma na qual ele está matriculado.
+class AlunoClassroomGradeListView(generics.ListAPIView):
+    serializer_class = GradeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Grade.objects.filter(
+            turma_id=self.kwargs.get("id"),
+            aluno=self.request.user,
+            turma__enrollments__aluno=self.request.user,
+            turma__enrollments__ativo=True,
+            ativo=True,
+        ).distinct().order_by("-created_at")

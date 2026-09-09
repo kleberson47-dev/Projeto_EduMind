@@ -2,14 +2,15 @@ from django.core.exceptions import ValidationError
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 
-from ..models import Activity, Classroom
-from ..serializers import (
-    ActivitySerializer,
+from ..models import Activity, Classroom, Grade
+from ..serializers.activity_serializers import ActivitySerializer
+from ..serializers.classroom_serializers import (
     ClassroomCreateSerializer,
     ClassroomDetailSerializer,
     ClassroomListSerializer,
     ClassroomUpdateSerializer,
 )
+from ..serializers.grade_serializers import GradeSerializer
 from ..services import listar_turmas_do_aluno
 
 
@@ -107,4 +108,52 @@ class ProfessorClassroomActivityListCreateView(generics.ListCreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(turma=turma)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+# Lista e registra notas de alunos para uma turma pertencente ao professor logado.
+class ProfessorClassroomGradeListCreateView(generics.ListCreateAPIView):
+    serializer_class = GradeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        if getattr(self.request.user, "role", None) != "professor":
+            return Grade.objects.none()
+        return Grade.objects.filter(
+            turma_id=self.kwargs.get("id"),
+            turma__professor=self.request.user,
+        ).order_by("-created_at")
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        turma = Classroom.objects.filter(
+            id=self.kwargs.get("id"),
+            professor=self.request.user,
+        ).first()
+        context["turma"] = turma
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if getattr(request.user, "role", None) != "professor":
+            return Response(
+                {"detail": "Apenas professores podem registrar notas."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        turma = Classroom.objects.filter(
+            id=kwargs.get("id"),
+            professor=request.user,
+        ).first()
+        if turma is None:
+            return Response(
+                {"detail": "Turma não encontrada ou não pertence ao professor."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = self.get_serializer(
+            data=request.data,
+            context={"request": request, "turma": turma},
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
