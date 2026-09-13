@@ -8,6 +8,7 @@ from .classroom_serializers import (
 )
 from .common_serializers import ProfessorResumoSerializer
 from .grade_serializers import GradeSerializer
+from .lesson_serializers import LessonBlockSerializer, LessonSectionSerializer, LessonSerializer
 
 __all__ = [
     "ActivitySerializer",
@@ -17,5 +18,8 @@ __all__ = [
     "ClassroomUpdateSerializer",
     "GradeSerializer",
     "JoinClassroomSerializer",
+    "LessonBlockSerializer",
+    "LessonSectionSerializer",
+    "LessonSerializer",
     "ProfessorResumoSerializer",
 ]

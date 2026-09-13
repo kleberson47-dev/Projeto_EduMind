@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 
-from ..models import Activity, Classroom, Grade
+from ..models import Activity, Classroom, Grade, Lesson, LessonBlock, LessonSection
 from ..serializers.activity_serializers import ActivitySerializer
 from ..serializers.classroom_serializers import (
     ClassroomDetailSerializer,
@@ -10,6 +10,11 @@ from ..serializers.classroom_serializers import (
     JoinClassroomSerializer,
 )
 from ..serializers.grade_serializers import GradeSerializer
+from ..serializers.lesson_serializers import (
+    LessonBlockSerializer,
+    LessonSectionSerializer,
+    LessonSerializer,
+)
 from ..services import listar_turmas_do_aluno, matricular_aluno_por_codigo
 
 
@@ -90,3 +95,63 @@ class AlunoClassroomGradeListView(generics.ListAPIView):
             turma__enrollments__ativo=True,
             ativo=True,
         ).distinct().order_by("-created_at")
+
+
+# Lista as aulas de uma turma em que o aluno está matriculado.
+class AlunoClassroomLessonListView(generics.ListAPIView):
+    serializer_class = LessonSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Lesson.objects.filter(
+            turma_id=self.kwargs.get("id"),
+            turma__enrollments__aluno=self.request.user,
+            turma__enrollments__ativo=True,
+            ativo=True,
+        ).distinct().order_by("ordem", "created_at")
+
+
+# Exibe uma aula específica com suas seções e blocos para o aluno matriculado.
+class AlunoClassroomLessonDetailView(generics.RetrieveAPIView):
+    serializer_class = LessonSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = "id"
+
+    def get_queryset(self):
+        return Lesson.objects.filter(
+            turma_id=self.kwargs.get("id"),
+            turma__enrollments__aluno=self.request.user,
+            turma__enrollments__ativo=True,
+            ativo=True,
+        ).distinct()
+
+
+# Lista as seções de uma aula em que o aluno está matriculado.
+class AlunoLessonSectionListView(generics.ListAPIView):
+    serializer_class = LessonSectionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return LessonSection.objects.filter(
+            aula_id=self.kwargs.get("lesson_id"),
+            aula__turma_id=self.kwargs.get("id"),
+            aula__turma__enrollments__aluno=self.request.user,
+            aula__turma__enrollments__ativo=True,
+            ativo=True,
+        ).distinct().order_by("ordem", "created_at")
+
+
+# Lista os blocos de uma seção em que o aluno está matriculado.
+class AlunoLessonBlockListView(generics.ListAPIView):
+    serializer_class = LessonBlockSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return LessonBlock.objects.filter(
+            secao_id=self.kwargs.get("section_id"),
+            secao__aula_id=self.kwargs.get("lesson_id"),
+            secao__aula__turma_id=self.kwargs.get("id"),
+            secao__aula__turma__enrollments__aluno=self.request.user,
+            secao__aula__turma__enrollments__ativo=True,
+            ativo=True,
+        ).distinct().order_by("ordem", "created_at")
