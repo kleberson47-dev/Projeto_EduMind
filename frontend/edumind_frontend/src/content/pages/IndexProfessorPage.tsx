@@ -1,29 +1,41 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import { clearAuthSession, getAccessToken } from '../../features/auth'
 import type { User } from '../../models'
 import { getCurrentUser } from '../../services'
-import { clearAuthSession, getAccessToken } from '../../features/auth'
 
-import './IndexAlunoPage.css'
+import './IndexProfessorPage.css'
 
-type NavItem = {
+interface NavItem {
   label: string
   active?: boolean
   icon: string
 }
 
-type Stat = {
+interface Stat {
   label: string
   value: string
   detail: string
   icon: string
 }
 
-type Deadline = {
+interface Deadline {
   title: string
   course: string
   deadline: string
+}
+
+interface Event {
+  time: string
+  title: string
+  course: string
+}
+
+interface CourseMetric {
+  subject: string
+  score: string
+  value: number
 }
 
 const navItems: NavItem[] = [
@@ -35,17 +47,17 @@ const navItems: NavItem[] = [
 ]
 
 const stats: Stat[] = [
-  { label: 'Turmas matriculadas', value: '4', detail: 'neste semestre', icon: '▣' },
-  { label: 'Atividades pendentes', value: '7', detail: '3 entregam esta semana', icon: '☰' },
-  { label: 'Atividades concluídas', value: '23', detail: 'de 30 no total', icon: '✓' },
-  { label: 'Média geral', value: '8,6', detail: '+0,4 vs. bimestre anterior', icon: '↗' },
+  { label: 'Turmas ativas', value: '4', detail: 'neste semestre', icon: '▣' },
+  { label: 'Total de alunos', value: '126', detail: 'em todas as turmas', icon: '☰' },
+  { label: 'Atividades pendentes', value: '7', detail: 'aguardando correção', icon: '✓' },
+  { label: 'Média das turmas', value: '8,2', detail: '+0,3 vs. bimestre anterior', icon: '↗' },
 ]
 
 const deadlines: Deadline[] = [
-  { title: 'Trabalho: Modelagem ER', course: 'Banco de Dados', deadline: 'Hoje, 23:59' },
-  { title: 'Quiz: Camadas de Nuvem', course: 'Computação em Nuvem', deadline: 'Amanhã, 18:00' },
-  { title: 'Projeto: Landing responsiva', course: 'Programação Web', deadline: 'Sex, 20 · 22:00' },
-  { title: 'Lista 4: Redes Neurais', course: 'Inteligência Artificial', deadline: 'Seg, 23 · 12:00' },
+  { title: 'Corrigir: Modelagem ER', course: 'Banco de Dados', deadline: 'Hoje, 23:59' },
+  { title: 'Publicar: Quiz de Nuvem', course: 'Computação em Nuvem', deadline: 'Amanhã, 18:00' },
+  { title: 'Revisar: Projetos responsivos', course: 'Programação Web', deadline: 'Sex, 20 · 22:00' },
+  { title: 'Preparar: Lista de exercícios', course: 'Inteligência Artificial', deadline: 'Seg, 23 · 12:00' },
 ]
 
 const weekDays = [
@@ -58,21 +70,17 @@ const weekDays = [
   { day: 'TER', date: 19 },
 ]
 
-const events = [
+const events: Event[] = [
   { time: '09:00', title: 'Aula ao vivo: Consultas SQL', course: 'Banco de Dados' },
   { time: '14:30', title: 'Monitoria de IA', course: 'Inteligência Artificial' },
-  { time: '19:00', title: 'Entrega do protótipo', course: 'Programação Web' },
+  { time: '19:00', title: 'Reunião de planejamento', course: 'Programação Web' },
 ]
 
-const performanceMetrics = [
-  {
-    left: { subject: 'Computação em Nuvem', score: 'Nota 9.1 · 82%', value: 82 },
-    right: { subject: 'Banco de Dados', score: 'Nota 8.4 · 68%', value: 68 },
-  },
-  {
-    left: { subject: 'Programação Web', score: 'Nota 8.9 · 74%', value: 74 },
-    right: { subject: 'Inteligência Artificial', score: 'Nota 7.9 · 55%', value: 55 },
-  },
+const courseMetrics: CourseMetric[] = [
+  { subject: 'Computação em Nuvem', score: 'Média 8,5 · 32 alunos', value: 85 },
+  { subject: 'Banco de Dados', score: 'Média 8,1 · 38 alunos', value: 81 },
+  { subject: 'Programação Web', score: 'Média 7,9 · 29 alunos', value: 79 },
+  { subject: 'Inteligência Artificial', score: 'Média 8,3 · 27 alunos', value: 83 },
 ]
 
 function getUserInitials(name: string): string {
@@ -84,13 +92,7 @@ function getUserInitials(name: string): string {
     .join('') || 'US'
 }
 
-function formatRole(role: User['role']): string {
-  if (role === 'aluno') return 'Aluno'
-  if (role === 'professor') return 'Professor'
-  return 'Usuário'
-}
-
-export default function IndexAlunoPage() {
+export default function IndexProfessorPage() {
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const [user, setUser] = useState<User | null>(null)
@@ -98,19 +100,17 @@ export default function IndexAlunoPage() {
   useEffect(() => {
     async function loadCurrentUser() {
       const token = getAccessToken()
-      if (!token) {
-        return
-      }
+      if (!token) return
 
       try {
         const profile = await getCurrentUser(token)
         setUser(profile)
 
-        if (profile.role === 'professor') {
-          navigate('/app/inicio_professor', { replace: true })
+        if (profile.role !== 'professor') {
+          navigate('/app/inicio_aluno', { replace: true })
         }
       } catch {
-        // ignorado intencionalmente: a página continua mesmo sem dados do usuário
+        // A página continua disponível mesmo que os dados do perfil não carreguem.
       }
     }
 
@@ -126,23 +126,20 @@ export default function IndexAlunoPage() {
     navigate('/app/editar-perfil')
   }
 
-  if (user && user.role !== 'aluno') {
-    return null
-  }
+  if (user && user.role !== 'professor') return null
 
-  const displayName = user?.nome ?? 'Usuário'
-  const firstName = displayName.split(' ')[0] ?? 'Usuário'
+  const displayName = user?.nome ?? 'Professor'
+  const firstName = displayName.split(' ')[0] ?? 'Professor'
   const profileInitials = getUserInitials(displayName)
-  const profileRole = user ? formatRole(user.role) : 'Aluno'
 
   return (
-    <div className="dashboard-aluno-page">
+    <div className="dashboard-aluno-page dashboard-professor-page">
       <aside className="dashboard-aluno-sidebar">
         <div className="sidebar-brand" aria-label="Logo Edumind">
           <div className="brand-mark">🔎</div>
           <div>
             <div className="brand-title">Edumind</div>
-            <div className="brand-subtitle">Área do aluno</div>
+            <div className="brand-subtitle">Área do professor</div>
           </div>
         </div>
 
@@ -156,8 +153,8 @@ export default function IndexAlunoPage() {
         </nav>
 
         <div className="assistant-card">
-          <div className="assistant-title">Assistente de Estudos IA</div>
-          <div className="assistant-copy">Tire dúvidas sobre suas disciplinas a qualquer momento.</div>
+          <div className="assistant-title">Assistente de Ensino IA</div>
+          <div className="assistant-copy">Planeje aulas, crie atividades e apoie suas turmas.</div>
         </div>
       </aside>
 
@@ -165,7 +162,7 @@ export default function IndexAlunoPage() {
         <header className="dashboard-header">
           <div className="search-box" aria-label="Buscar turmas e atividades">
             <span className="search-icon">⌕</span>
-            <span>Buscar turmas, atividades...</span>
+            <span>Buscar turmas, alunos, atividades...</span>
           </div>
 
           <div className="header-actions">
@@ -178,7 +175,7 @@ export default function IndexAlunoPage() {
               className="profile-chip"
               aria-label="Perfil do usuário"
               aria-expanded={menuOpen}
-              onClick={() => setMenuOpen((prev) => !prev)}
+              onClick={() => setMenuOpen((currentValue) => !currentValue)}
             >
               <div className="profile-badge">{profileInitials}</div>
               <span>{firstName}</span>
@@ -191,7 +188,7 @@ export default function IndexAlunoPage() {
             <div className="profile-menu" aria-label="Menu do perfil">
               <div className="profile-menu-head">
                 <div className="profile-menu-name">{user.nome}</div>
-                <div className="profile-menu-role">{profileRole}</div>
+                <div className="profile-menu-role">Professor</div>
               </div>
 
               <button type="button" className="profile-menu-item" onClick={handleOpenConfig}>
@@ -208,10 +205,8 @@ export default function IndexAlunoPage() {
 
           <div className="welcome-banner">
             <div className="banner-date">Terça-feira, 19 de agosto</div>
-            <h1>
-              Olá, {displayName} <span className="wave">👋</span>
-            </h1>
-            <p>Você tem 3 entregas nos próximos dias e sua média subiu para 8,6. Continue assim.</p>
+            <h1>Olá, professor {firstName}</h1>
+            <p>Você tem 7 atividades aguardando correção e 3 compromissos nos próximos dias.</p>
           </div>
         </section>
 
@@ -231,10 +226,8 @@ export default function IndexAlunoPage() {
         <section className="dashboard-lower">
           <div className="panel deadlines-panel">
             <div className="panel-header">
-              <div className="panel-title">Próximos prazos</div>
-              <button type="button" className="mini-link">
-                Ver todos ↗
-              </button>
+              <div className="panel-title">Pendências recentes</div>
+              <button type="button" className="mini-link">Ver todas ↗</button>
             </div>
 
             <div className="deadline-list">
@@ -252,7 +245,7 @@ export default function IndexAlunoPage() {
 
           <div className="panel events-panel">
             <div className="panel-header compact-header">
-              <div className="panel-title">Últimos 7 dias</div>
+              <div className="panel-title">Próximos 7 dias</div>
             </div>
 
             <div className="day-grid" aria-label="Calendário semanal">
@@ -278,32 +271,20 @@ export default function IndexAlunoPage() {
           </div>
         </section>
 
-        <section className="performance-panel panel" aria-label="Estatísticas de desempenho">
-          <h2 className="performance-title">Estatísticas de desempenho</h2>
+        <section className="performance-panel panel" aria-label="Desempenho das turmas">
+          <h2 className="performance-title">Desempenho das turmas</h2>
 
           <div className="performance-grid">
-            {performanceMetrics.map((pair) => (
-              <>
-                <div key={`${pair.left.subject}-left`} className="performance-item">
-                  <div className="performance-head">
-                    <span className="performance-name">{pair.left.subject}</span>
-                    <span className="performance-score">{pair.left.score}</span>
-                  </div>
-                  <div className="performance-track" aria-label={`${pair.left.subject} em ${pair.left.value}%`}>
-                    <span className="performance-fill" style={{ width: `${pair.left.value}%` }} />
-                  </div>
+            {courseMetrics.map((course) => (
+              <div key={course.subject} className="performance-item">
+                <div className="performance-head">
+                  <span className="performance-name">{course.subject}</span>
+                  <span className="performance-score">{course.score}</span>
                 </div>
-
-                <div key={`${pair.right.subject}-right`} className="performance-item">
-                  <div className="performance-head">
-                    <span className="performance-name">{pair.right.subject}</span>
-                    <span className="performance-score">{pair.right.score}</span>
-                  </div>
-                  <div className="performance-track" aria-label={`${pair.right.subject} em ${pair.right.value}%`}>
-                    <span className="performance-fill" style={{ width: `${pair.right.value}%` }} />
-                  </div>
+                <div className="performance-track" aria-label={`${course.subject} com média de ${course.value}%`}>
+                  <span className="performance-fill" style={{ width: `${course.value}%` }} />
                 </div>
-              </>
+              </div>
             ))}
           </div>
         </section>
