@@ -4,14 +4,9 @@ import { useNavigate } from 'react-router-dom'
 import { clearAuthSession, getAccessToken } from '../../features/auth'
 import type { User } from '../../models'
 import { getCurrentUser } from '../../services'
+import { ProfessorSidebar } from '../../components/ProfessorSidebar/ProfessorSidebar'
 
 import './IndexProfessorPage.css'
-
-interface NavItem {
-  label: string
-  active?: boolean
-  icon: string
-}
 
 interface Stat {
   label: string
@@ -37,14 +32,6 @@ interface CourseMetric {
   score: string
   value: number
 }
-
-const navItems: NavItem[] = [
-  { label: 'Inicio', active: true, icon: '▣' },
-  { label: 'Turmas', icon: '◫' },
-  { label: 'Agenda', icon: '◫' },
-  { label: 'Atividades', icon: '≋' },
-  { label: 'Configurações', icon: '⚙' },
-]
 
 const stats: Stat[] = [
   { label: 'Turmas ativas', value: '4', detail: 'neste semestre', icon: '▣' },
@@ -134,29 +121,7 @@ export default function IndexProfessorPage() {
 
   return (
     <div className="dashboard-aluno-page dashboard-professor-page">
-      <aside className="dashboard-aluno-sidebar">
-        <div className="sidebar-brand" aria-label="Logo Edumind">
-          <div className="brand-mark">🔎</div>
-          <div>
-            <div className="brand-title">Edumind</div>
-            <div className="brand-subtitle">Área do professor</div>
-          </div>
-        </div>
-
-        <nav className="sidebar-nav" aria-label="Menu lateral">
-          {navItems.map((item) => (
-            <button key={item.label} type="button" className={item.active ? 'nav-item active' : 'nav-item'}>
-              <span className="nav-icon">{item.icon}</span>
-              <span>{item.label}</span>
-            </button>
-          ))}
-        </nav>
-
-        <div className="assistant-card">
-          <div className="assistant-title">Assistente de Ensino IA</div>
-          <div className="assistant-copy">Planeje aulas, crie atividades e apoie suas turmas.</div>
-        </div>
-      </aside>
+      <ProfessorSidebar activeItem="inicio" />
 
       <main className="dashboard-aluno-main">
         <header className="dashboard-header">

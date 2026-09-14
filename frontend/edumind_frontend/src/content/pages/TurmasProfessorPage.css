@@ -1,0 +1,501 @@
+.turmas-professor-layout {
+  display: flex;
+  min-height: 100svh;
+}
+
+.turmas-professor-page {
+  width: 100%;
+  max-width: none;
+  padding: 40px 44px 48px;
+  color: #163254;
+}
+
+.turmas-professor-page > * {
+  max-width: 1220px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.turmas-professor-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.turmas-professor-eyebrow {
+  margin: 0 0 7px;
+  color: #288fc1;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.turmas-professor-header h1,
+.classroom-list-heading h2,
+.classroom-card h3 {
+  margin: 0;
+  color: #112d4e;
+}
+
+.turmas-professor-header h1 {
+  font-size: 2rem;
+  line-height: 1.15;
+}
+
+.turmas-professor-subtitle {
+  margin: 9px 0 0;
+  color: #60748f;
+}
+
+.create-classroom-button,
+.open-classroom-button,
+.empty-classroom-button {
+  border: 0;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.create-classroom-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 17px;
+  border-radius: 7px;
+  background: #1679c4;
+  color: #fff;
+  box-shadow: 0 7px 16px rgba(22, 121, 196, 0.2);
+}
+
+.create-classroom-button span {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.classroom-summary {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 32px;
+  padding: 17px 19px;
+  border: 1px solid #cce8f3;
+  border-radius: 7px;
+  background: #effaff;
+}
+
+.summary-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  place-items: center;
+  border-radius: 7px;
+  background: #d3f1f5;
+  color: #147a9a;
+  font-size: 1.35rem;
+}
+
+.classroom-summary strong {
+  display: block;
+  font-size: 0.95rem;
+}
+
+.classroom-summary p {
+  margin: 4px 0 0;
+  color: #56718b;
+  font-size: 0.89rem;
+}
+
+.classroom-list-section {
+  margin-top: 34px;
+}
+
+.classroom-list-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.classroom-list-heading h2 {
+  font-size: 1.1rem;
+}
+
+.classroom-list-heading span {
+  color: #6a7d95;
+  font-size: 0.86rem;
+}
+
+.classroom-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.classroom-feedback {
+  padding: 24px;
+  border: 1px solid #cce8f3;
+  border-radius: 7px;
+  background: #effaff;
+  color: #426884;
+  font-size: 0.92rem;
+}
+
+.classroom-feedback-error {
+  border-color: #efc3c3;
+  background: #fff6f6;
+  color: #a53f3f;
+}
+
+.classroom-card {
+  display: flex;
+  min-height: 284px;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #dce8f2;
+  border-radius: 7px;
+  background: #fff;
+  box-shadow: 0 8px 18px rgba(35, 78, 117, 0.07);
+}
+
+.classroom-card-banner {
+  display: flex;
+  min-height: 74px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+}
+
+.classroom-card-banner.cyan {
+  background: #d9f4f5;
+  color: #157c98;
+}
+
+.classroom-card-banner.blue {
+  background: #deedfd;
+  color: #286fb5;
+}
+
+.classroom-card-banner.yellow {
+  background: #fff2cf;
+  color: #a96d10;
+}
+
+.classroom-card-symbol {
+  font-size: 1.75rem;
+}
+
+.classroom-active-label {
+  padding: 5px 8px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #355570;
+  font-size: 0.73rem;
+  font-weight: 700;
+}
+
+.classroom-card-content {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  padding: 19px;
+}
+
+.classroom-card h3 {
+  font-size: 1.08rem;
+}
+
+.classroom-card p {
+  margin: 8px 0 0;
+  color: #60748f;
+  font-size: 0.88rem;
+  line-height: 1.48;
+}
+
+.classroom-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin-top: auto;
+  padding-top: 17px;
+  color: #55708b;
+  font-size: 0.78rem;
+}
+
+.open-classroom-button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 15px;
+  padding: 10px 0 0;
+  border-top: 1px solid #e4edf4;
+  background: transparent;
+  color: #1776bd;
+  text-align: left;
+}
+
+.open-classroom-button span {
+  font-size: 1.1rem;
+}
+
+.classroom-card-empty {
+  align-items: center;
+  justify-content: center;
+  border-style: dashed;
+  border-color: #aac9de;
+  background: #fafdff;
+  box-shadow: none;
+  text-align: center;
+}
+
+.empty-classroom-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 50%;
+  background: #dff1fb;
+  color: #197abe;
+  font-size: 1.65rem;
+}
+
+.classroom-card-empty h3 {
+  margin-top: 14px;
+}
+
+.classroom-card-empty p {
+  max-width: 210px;
+}
+
+.empty-classroom-button {
+  margin-top: 17px;
+  border-radius: 6px;
+  background: transparent;
+  color: #197abe;
+}
+
+.turmas-professor-footer {
+  margin-top: 34px;
+}
+
+.turmas-professor-footer a {
+  color: #3d7198;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.turmas-professor-footer a:hover,
+.open-classroom-button:hover,
+.empty-classroom-button:hover {
+  color: #105b99;
+}
+
+.create-classroom-button:hover {
+  background: #106bac;
+}
+
+.classroom-modal-backdrop {
+  position: fixed;
+  z-index: 10;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(16, 45, 78, 0.42);
+}
+
+.classroom-create-modal {
+  width: min(100%, 600px);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  border-radius: 7px;
+  background: #fff;
+  box-shadow: 0 20px 45px rgba(16, 45, 78, 0.26);
+}
+
+.classroom-create-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 23px 25px 18px;
+  border-bottom: 1px solid #e1ebf3;
+}
+
+.classroom-create-header p {
+  margin: 0 0 5px;
+  color: #288fc1;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.classroom-create-header h2 {
+  margin: 0;
+  color: #112d4e;
+  font-size: 1.3rem;
+}
+
+.close-classroom-modal-button {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #54718d;
+  cursor: pointer;
+  font-size: 1.7rem;
+  line-height: 1;
+}
+
+.close-classroom-modal-button:hover {
+  background: #edf6fb;
+  color: #135f9e;
+}
+
+.classroom-create-form {
+  display: grid;
+  gap: 17px;
+  padding: 22px 25px 25px;
+}
+
+.classroom-create-form label {
+  display: grid;
+  gap: 7px;
+  color: #284967;
+  font-size: 0.87rem;
+  font-weight: 700;
+}
+
+.classroom-create-form input,
+.classroom-create-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #bfd3e3;
+  border-radius: 6px;
+  background: #fbfdff;
+  color: #183957;
+  font: inherit;
+  font-weight: 400;
+}
+
+.classroom-create-form input {
+  min-height: 42px;
+  padding: 0 12px;
+}
+
+.classroom-create-form textarea {
+  min-height: 76px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+
+.classroom-create-form input:focus,
+.classroom-create-form textarea:focus {
+  outline: 2px solid #82c9e9;
+  outline-offset: 1px;
+}
+
+.classroom-form-error {
+  margin: 0;
+  color: #a53f3f;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.classroom-create-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 3px;
+}
+
+.cancel-classroom-button,
+.submit-classroom-button {
+  min-height: 40px;
+  border-radius: 6px;
+  padding: 0 15px;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cancel-classroom-button {
+  border: 1px solid #c5d8e7;
+  background: #fff;
+  color: #40627f;
+}
+
+.submit-classroom-button {
+  border: 1px solid #1679c4;
+  background: #1679c4;
+  color: #fff;
+}
+
+.cancel-classroom-button:hover {
+  background: #eff7fb;
+}
+
+.submit-classroom-button:hover {
+  border-color: #106bac;
+  background: #106bac;
+}
+
+@media (max-width: 960px) {
+  .classroom-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .turmas-professor-page {
+    padding: 28px 20px 36px;
+  }
+
+  .turmas-professor-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .turmas-professor-header h1 {
+    font-size: 1.65rem;
+  }
+
+  .create-classroom-button {
+    width: 100%;
+  }
+
+  .classroom-summary {
+    align-items: flex-start;
+  }
+
+  .classroom-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .classroom-modal-backdrop {
+    align-items: end;
+    padding: 0;
+  }
+
+  .classroom-create-modal {
+    max-height: calc(100vh - 20px);
+    border-radius: 7px 7px 0 0;
+  }
+
+  .classroom-create-header,
+  .classroom-create-form {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+}

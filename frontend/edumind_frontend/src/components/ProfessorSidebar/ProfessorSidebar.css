@@ -1,0 +1,110 @@
+.professor-sidebar {
+  display: flex;
+  width: 252px;
+  min-height: 100svh;
+  flex: 0 0 252px;
+  flex-direction: column;
+  box-sizing: border-box;
+  border-right: 1px solid #d8e8f3;
+  background: #f7fbff;
+  padding: 26px 16px;
+}
+
+.professor-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px 28px;
+}
+
+.professor-brand-mark {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 7px;
+  background: #1679c4;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.professor-brand-title {
+  color: #112d4e;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.professor-brand-subtitle {
+  margin-top: 2px;
+  color: #59809d;
+  font-size: 0.73rem;
+}
+
+.professor-sidebar-nav {
+  display: grid;
+  gap: 5px;
+}
+
+.professor-nav-item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 12px;
+  min-height: 42px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #4f6d89;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.professor-nav-item:hover {
+  background: #eaf5fb;
+  color: #176cae;
+}
+
+.professor-nav-item.active {
+  background: #dceff9;
+  color: #176cae;
+  font-weight: 800;
+}
+
+.professor-nav-icon {
+  display: grid;
+  width: 36px;
+  place-items: center;
+  color: #207fba;
+  font-size: 1.1rem;
+}
+
+.professor-assistant-card {
+  margin-top: auto;
+  border: 1px solid #cde6f3;
+  border-radius: 7px;
+  background: #eaf8fb;
+  padding: 15px;
+}
+
+.professor-assistant-title {
+  color: #1a5b86;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.professor-assistant-copy {
+  margin-top: 7px;
+  color: #52748d;
+  font-size: 0.77rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 760px) {
+  .professor-sidebar {
+    display: none;
+  }
+}
