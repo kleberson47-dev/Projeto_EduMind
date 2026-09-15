@@ -196,10 +196,13 @@ export default function TurmasProfessorPage() {
                   <span>Código: {classroom.codigo_acesso}</span>
                 </div>
 
-                <button type="button" className="open-classroom-button">
+                <Link
+                  to={`/app/turmas-professor/${classroom.id}`}
+                  className="open-classroom-button"
+                >
                   Abrir turma
                   <span aria-hidden="true">→</span>
-                </button>
+                </Link>
               </div>
             </article>
             ))}

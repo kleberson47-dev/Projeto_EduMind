@@ -1,0 +1,52 @@
+.temporary-message {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 20;
+  width: min(360px, calc(100vw - 48px));
+  box-sizing: border-box;
+  padding: 12px 16px;
+  border: 1px solid;
+  border-radius: 7px;
+  box-shadow: 0 10px 24px rgba(35, 78, 117, 0.16);
+  font-weight: 700;
+  overflow: hidden;
+}
+
+.temporary-message-progress {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: currentColor;
+  opacity: 0.55;
+  transform-origin: left;
+  animation: temporary-message-progress 3s linear forwards;
+}
+
+@keyframes temporary-message-progress {
+  to {
+    transform: scaleX(0);
+  }
+}
+
+.temporary-message-success {
+  border-color: #a9dfca;
+  background: #eefbf4;
+  color: #16734a;
+}
+
+.temporary-message-error {
+  border-color: #f0c8c8;
+  background: #fff7f7;
+  color: #a13d3d;
+}
+
+@media (max-width: 760px) {
+  .temporary-message {
+    top: 16px;
+    right: 16px;
+    width: calc(100vw - 32px);
+  }
+}

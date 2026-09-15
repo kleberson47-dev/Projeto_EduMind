@@ -15,6 +15,7 @@ import type {
   LessonBlock,
   LessonSection,
   UpdateClassroomRequest,
+  UpdateClassroomResponse,
 } from '../models/Classroom'
 import { API_ENDPOINTS } from '../utils/api'
 import { requestJson } from '../utils/requests'
@@ -79,8 +80,8 @@ export async function updateProfessorClassroom(
   classroomId: number,
   payload: UpdateClassroomRequest,
   token: string,
-): Promise<ClassroomDetail> {
-  return requestJson<ClassroomDetail>(
+): Promise<UpdateClassroomResponse> {
+  return requestJson<UpdateClassroomResponse>(
     API_ENDPOINTS.classrooms.professorDetail(classroomId),
     { method: 'PATCH', body: payload, token },
   )

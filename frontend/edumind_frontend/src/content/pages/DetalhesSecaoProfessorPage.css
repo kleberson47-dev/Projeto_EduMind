@@ -1,0 +1,404 @@
+.detalhes-secao-professor-layout {
+  display: flex;
+  min-height: 100svh;
+}
+
+.detalhes-secao-professor-page {
+  width: 100%;
+  padding: 40px 44px 48px;
+  color: #163254;
+}
+
+.detalhes-secao-professor-page > * {
+  max-width: 1220px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.detalhes-secao-professor-header > p,
+.detalhes-secao-professor-blocks-heading p {
+  margin: 0 0 7px;
+  color: #288fc1;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.detalhes-secao-professor-header h1,
+.detalhes-secao-professor-blocks h2,
+.detalhes-secao-professor-empty-card h3 {
+  margin: 0;
+  color: #112d4e;
+}
+
+.detalhes-secao-professor-header h1 {
+  font-size: 2rem;
+  line-height: 1.15;
+}
+
+.detalhes-secao-professor-header > span,
+.detalhes-secao-professor-blocks-heading > div > span,
+.detalhes-secao-professor-summary p,
+.detalhes-secao-professor-empty-card p {
+  display: block;
+  margin-top: 9px;
+  color: #60748f;
+  line-height: 1.5;
+}
+
+.detalhes-secao-professor-summary {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 32px;
+  padding: 17px 19px;
+  border: 1px solid #cce8f3;
+  border-radius: 7px;
+  background: #effaff;
+}
+
+.detalhes-secao-professor-summary > div:first-child,
+.detalhes-secao-professor-empty-card > div {
+  display: grid;
+  place-items: center;
+}
+
+.detalhes-secao-professor-summary > div:first-child {
+  width: 38px;
+  height: 38px;
+  border-radius: 7px;
+  background: #d3f1f5;
+  color: #147a9a;
+  font-size: 1.35rem;
+}
+
+.detalhes-secao-professor-summary strong {
+  font-size: 0.95rem;
+}
+
+.detalhes-secao-professor-summary p {
+  margin-bottom: 0;
+  font-size: 0.89rem;
+}
+
+.detalhes-secao-professor-blocks {
+  margin-top: 34px;
+}
+
+.detalhes-secao-professor-blocks-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.detalhes-secao-professor-blocks-heading h2 {
+  font-size: 1.15rem;
+}
+
+.detalhes-secao-professor-blocks-heading > span {
+  color: #60748f;
+  font-size: 0.84rem;
+}
+
+.detalhes-secao-professor-empty-card {
+  display: grid;
+  justify-items: center;
+  max-width: 380px;
+  min-height: 240px;
+  margin-top: 20px;
+  padding: 28px;
+  box-sizing: border-box;
+  border: 1px dashed #aac9de;
+  border-radius: 7px;
+  background: #fafdff;
+  text-align: center;
+}
+
+.detalhes-secao-professor-empty-card > div {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #dff1fb;
+  color: #197abe;
+  font-size: 1.65rem;
+}
+
+.detalhes-secao-professor-empty-card h3 {
+  margin-top: 14px;
+}
+
+.detalhes-secao-professor-empty-card p {
+  max-width: 250px;
+  font-size: 0.89rem;
+}
+
+.detalhes-secao-professor-empty-card button {
+  margin-top: 17px;
+  border: 0;
+  background: transparent;
+  color: #197abe;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.detalhes-secao-professor-status {
+  margin: 20px 0 0;
+  color: #60748f;
+}
+
+.detalhes-secao-professor-status-error {
+  color: #bd3b4b;
+}
+
+.detalhes-secao-professor-block-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.detalhes-secao-professor-block-card {
+  min-height: 190px;
+  padding: 20px;
+  border: 1px solid #d8e8f1;
+  border-radius: 7px;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgb(43 98 138 / 8%);
+}
+
+.detalhes-secao-professor-block-card > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.detalhes-secao-professor-block-card span {
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #e4f4fb;
+  color: #197abe;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.detalhes-secao-professor-block-card h3 {
+  margin: 16px 0 0;
+  color: #112d4e;
+  font-size: 1rem;
+}
+
+.detalhes-secao-professor-block-card p {
+  margin: 9px 0 0;
+  color: #60748f;
+  font-size: 0.89rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.detalhes-secao-professor-block-card footer {
+  margin-top: 18px;
+  color: #3d7198;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.detalhes-secao-professor-footer {
+  margin-top: 34px;
+}
+
+.detalhes-secao-professor-footer a {
+  color: #3d7198;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.detalhes-secao-professor-footer a:hover,
+.detalhes-secao-professor-empty-card button:hover {
+  color: #105b99;
+}
+
+.detalhes-secao-professor-modal-backdrop {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgb(17 45 78 / 38%);
+}
+
+.detalhes-secao-professor-modal {
+  width: min(100%, 580px);
+  max-height: calc(100svh - 40px);
+  overflow-y: auto;
+  border-radius: 7px;
+  background: #ffffff;
+  box-shadow: 0 20px 48px rgb(17 45 78 / 24%);
+}
+
+.detalhes-secao-professor-modal > header,
+.detalhes-secao-professor-modal form,
+.detalhes-secao-professor-modal form > footer {
+  display: flex;
+}
+
+.detalhes-secao-professor-modal > header {
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid #d8e8f1;
+}
+
+.detalhes-secao-professor-modal header p {
+  margin: 0 0 5px;
+  color: #288fc1;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.detalhes-secao-professor-modal h2 {
+  margin: 0;
+  color: #112d4e;
+  font-size: 1.25rem;
+}
+
+.detalhes-secao-professor-modal > header button {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 4px;
+  background: #effaff;
+  color: #3d7198;
+  cursor: pointer;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.detalhes-secao-professor-modal form {
+  flex-direction: column;
+  gap: 16px;
+  padding: 22px 24px 24px;
+}
+
+.detalhes-secao-professor-modal label {
+  display: grid;
+  gap: 7px;
+  color: #163254;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.detalhes-secao-professor-modal small {
+  color: #60748f;
+  font-size: 0.76rem;
+  font-weight: 400;
+}
+
+.detalhes-secao-professor-modal input,
+.detalhes-secao-professor-modal select,
+.detalhes-secao-professor-modal textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #c9ddeb;
+  border-radius: 5px;
+  background: #fbfdff;
+  color: #163254;
+  font: inherit;
+  font-weight: 400;
+}
+
+.detalhes-secao-professor-modal input,
+.detalhes-secao-professor-modal select {
+  min-height: 40px;
+  padding: 0 11px;
+}
+
+.detalhes-secao-professor-modal textarea {
+  padding: 10px 11px;
+  line-height: 1.45;
+  resize: vertical;
+}
+
+.detalhes-secao-professor-form-row {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  align-items: end;
+  gap: 16px;
+}
+
+.detalhes-secao-professor-checkbox {
+  display: flex !important;
+  align-items: center;
+  min-height: 40px;
+  gap: 8px;
+}
+
+.detalhes-secao-professor-checkbox input {
+  width: 16px;
+  min-height: auto;
+}
+
+.detalhes-secao-professor-form-error {
+  margin: -4px 0 0;
+  color: #bd3b4b;
+  font-size: 0.85rem;
+}
+
+.detalhes-secao-professor-modal form > footer {
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.detalhes-secao-professor-modal form > footer button {
+  min-height: 39px;
+  border: 0;
+  border-radius: 5px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.detalhes-secao-professor-modal form > footer button:first-child {
+  padding: 0 12px;
+  background: transparent;
+  color: #3d7198;
+}
+
+.detalhes-secao-professor-modal form > footer button:last-child {
+  padding: 0 15px;
+  background: #197abe;
+  color: #ffffff;
+}
+
+.detalhes-secao-professor-modal button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+@media (max-width: 760px) {
+  .detalhes-secao-professor-layout {
+    display: block;
+  }
+
+  .detalhes-secao-professor-page {
+    padding: 28px 20px 36px;
+  }
+
+  .detalhes-secao-professor-blocks-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .detalhes-secao-professor-form-row {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,377 @@
+.detalhes-turma-professor-layout {
+  display: flex;
+  min-height: 100svh;
+}
+
+.detalhes-turma-professor-page {
+  width: 100%;
+  padding: 40px 44px 48px;
+  color: #163254;
+}
+
+.detalhes-turma-professor-page > * {
+  max-width: 1220px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.detalhes-turma-header h1,
+.detalhes-turma-overview h2,
+.detalhes-turma-section-card h2 {
+  margin: 0;
+  color: #112d4e;
+}
+
+.detalhes-turma-eyebrow,
+.detalhes-turma-label {
+  margin: 0 0 7px;
+  color: #288fc1;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.detalhes-turma-header h1 {
+  font-size: 2rem;
+  line-height: 1.15;
+}
+
+.detalhes-turma-subtitle {
+  margin: 9px 0 0;
+  color: #60748f;
+}
+
+.detalhes-turma-feedback {
+  margin-top: 34px;
+  padding: 20px 22px;
+  border: 1px solid #cce8f3;
+  border-radius: 7px;
+  background: #effaff;
+  color: #456985;
+}
+
+.detalhes-turma-feedback-error {
+  border-color: #f0c8c8;
+  background: #fff7f7;
+  color: #a13d3d;
+}
+
+.detalhes-turma-feedback p {
+  margin: 0;
+}
+
+.detalhes-turma-feedback a {
+  display: inline-block;
+  margin-top: 10px;
+  color: #176cae;
+  font-weight: 700;
+}
+
+.detalhes-turma-overview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 34px;
+  padding: 28px;
+  border: 1px solid #cce8f3;
+  border-radius: 7px;
+  background: #effaff;
+}
+
+.detalhes-turma-overview h2 {
+  font-size: 1.25rem;
+}
+
+.detalhes-turma-overview p:not(.detalhes-turma-label) {
+  max-width: 600px;
+  margin: 8px 0 0;
+  color: #56718b;
+  line-height: 1.5;
+}
+
+.detalhes-turma-overview .detalhes-turma-rules,
+.detalhes-turma-overview .detalhes-turma-members {
+  font-size: 0.9rem;
+}
+
+.detalhes-turma-code {
+  min-width: 180px;
+  padding: 15px 17px;
+  border: 1px solid #bce2ed;
+  border-radius: 7px;
+  background: #fff;
+}
+
+.detalhes-turma-code span {
+  display: block;
+  color: #56718b;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.detalhes-turma-code strong {
+  display: block;
+  margin-top: 5px;
+  color: #176cae;
+  font-size: 1.08rem;
+  letter-spacing: 0.08em;
+}
+
+.detalhes-turma-code small {
+  display: block;
+  margin-top: 8px;
+  color: #56718b;
+}
+
+.detalhes-turma-edit {
+  margin-top: 28px;
+  padding: 28px;
+  border: 1px solid #dce8f2;
+  border-radius: 7px;
+  background: #fff;
+}
+
+.detalhes-turma-edit-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.detalhes-turma-edit h2 {
+  margin: 0;
+  color: #112d4e;
+  font-size: 1.25rem;
+}
+
+.detalhes-turma-edit-button,
+.detalhes-turma-cancel-button {
+  border: 0;
+  border-radius: 6px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.detalhes-turma-edit-button {
+  padding: 10px 14px;
+  background: #176cae;
+  color: #fff;
+}
+
+.detalhes-turma-edit-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.detalhes-turma-edit-form label:not(.detalhes-turma-active-field) {
+  display: grid;
+  gap: 7px;
+}
+
+.detalhes-turma-edit-form label:nth-child(n + 2):not(.detalhes-turma-active-field) {
+  grid-column: 1 / -1;
+}
+
+.detalhes-turma-edit-form span {
+  color: #456985;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.detalhes-turma-edit-form input:not([type='checkbox']),
+.detalhes-turma-edit-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #bfd6e6;
+  border-radius: 6px;
+  color: #163254;
+  font: inherit;
+  resize: vertical;
+}
+
+.detalhes-turma-active-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detalhes-turma-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  grid-column: 1 / -1;
+}
+
+.detalhes-turma-cancel-button {
+  padding: 10px 14px;
+  background: #e8f1f6;
+  color: #456985;
+}
+
+.detalhes-turma-form-error {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #a13d3d;
+  font-size: 0.875rem;
+}
+
+.detalhes-turma-save-button {
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 6px;
+  background: #176cae;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.detalhes-turma-save-button:disabled,
+.detalhes-turma-cancel-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.detalhes-turma-lessons {
+  margin-top: 28px;
+  padding: 28px;
+  border: 1px solid #dce8f2;
+  border-radius: 7px;
+  background: #fff;
+}
+
+.detalhes-turma-lessons-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.detalhes-turma-lessons h2,
+.detalhes-turma-lessons h3 {
+  margin: 0;
+  color: #112d4e;
+}
+
+.detalhes-turma-lessons h2 {
+  font-size: 1.25rem;
+}
+
+.detalhes-turma-lessons-heading p:not(.detalhes-turma-label),
+.detalhes-turma-lessons-empty p {
+  margin: 8px 0 0;
+  color: #60748f;
+  line-height: 1.5;
+}
+
+.detalhes-turma-add-lesson-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 6px;
+  background: #176cae;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.detalhes-turma-lessons-empty {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px dashed #b8d8e8;
+  border-radius: 7px;
+  background: #f8fcff;
+}
+
+.detalhes-turma-lessons-empty h3 {
+  font-size: 1rem;
+}
+
+.detalhes-turma-sections {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 28px;
+}
+
+.detalhes-turma-section-card {
+  min-height: 178px;
+  padding: 22px;
+  border: 1px solid #dce8f2;
+  border-radius: 7px;
+  background: #fff;
+  box-shadow: 0 8px 18px rgba(35, 78, 117, 0.07);
+}
+
+.detalhes-turma-section-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 7px;
+  background: #d9f4f5;
+  color: #157c98;
+  font-size: 1.25rem;
+}
+
+.detalhes-turma-section-card h2 {
+  margin-top: 18px;
+  font-size: 1.05rem;
+}
+
+.detalhes-turma-section-card p {
+  margin: 8px 0 0;
+  color: #60748f;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .detalhes-turma-sections {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .detalhes-turma-professor-page {
+    padding: 28px 20px 36px;
+  }
+
+  .detalhes-turma-overview {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .detalhes-turma-code {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .detalhes-turma-edit-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .detalhes-turma-lessons-heading,
+  .detalhes-turma-lessons-empty {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .detalhes-turma-edit-form {
+    grid-template-columns: 1fr;
+  }
+
+}

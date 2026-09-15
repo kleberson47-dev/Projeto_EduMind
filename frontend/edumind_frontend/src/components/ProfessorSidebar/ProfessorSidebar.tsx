@@ -23,6 +23,14 @@ const navItems: ProfessorNavItem[] = [
 export function ProfessorSidebar({ activeItem }: ProfessorSidebarProps) {
   const navigate = useNavigate()
 
+  const createNavigationHandler = (path: string | undefined) => {
+    if (path === undefined) {
+      return undefined
+    }
+
+    return () => navigate(path)
+  }
+
   return (
     <aside className="professor-sidebar">
       <div className="professor-sidebar-brand" aria-label="Logo Edumind">
@@ -44,7 +52,7 @@ export function ProfessorSidebar({ activeItem }: ProfessorSidebarProps) {
               key={item.label}
               type="button"
               className={isActive ? 'professor-nav-item active' : 'professor-nav-item'}
-              onClick={item.path ? () => navigate(item.path) : undefined}
+              onClick={createNavigationHandler(item.path)}
             >
               <span className="professor-nav-icon">{item.icon}</span>
               <span>{item.label}</span>

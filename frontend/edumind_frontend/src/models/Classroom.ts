@@ -46,6 +46,14 @@ export interface UpdateClassroomRequest {
   ativo?: boolean
 }
 
+export interface UpdateClassroomResponse {
+  nome: string
+  descricao: string
+  criterios_avaliacao: string
+  regras: string
+  ativo: boolean
+}
+
 export interface JoinClassroomRequest {
   codigo_acesso: string
 }

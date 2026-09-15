@@ -29,6 +29,16 @@ const EsqueceuSenhaPage = loader(lazy(() => import('./content/pages/EsqueceuSenh
 const IndexAlunoPage = loader(lazy(() => import('./content/pages/IndexAlunoPage')))
 const IndexProfessorPage = loader(lazy(() => import('./content/pages/IndexProfessorPage')))
 const TurmasProfessorPage = loader(lazy(() => import('./content/pages/TurmasProfessorPage')))
+const DetalhesTurmaProfessorPage = loader(
+  lazy(() => import('./content/pages/DetalhesTurmaProfessorPage')),
+)
+const AulasProfessorPage = loader(lazy(() => import('./content/pages/AulasProfessorPage')))
+const DetalhesAulaProfessorPage = loader(
+  lazy(() => import('./content/pages/DetalhesAulaProfessorPage')),
+)
+const DetalhesSecaoProfessorPage = loader(
+  lazy(() => import('./content/pages/DetalhesSecaoProfessorPage')),
+)
 const EditarPerfilPage = loader(lazy(() => import('./content/pages/EditarPerfil')))
 
 export const appRouter = createBrowserRouter([
@@ -75,6 +85,22 @@ export const appRouter = createBrowserRouter([
           {
             path: 'turmas-professor',
             element: <TurmasProfessorPage />,
+          },
+          {
+            path: 'turmas-professor/:classroomId',
+            element: <DetalhesTurmaProfessorPage />,
+          },
+          {
+            path: 'turmas-professor/:classroomId/aulas',
+            element: <AulasProfessorPage />,
+          },
+          {
+            path: 'turmas-professor/:classroomId/aulas/:lessonId',
+            element: <DetalhesAulaProfessorPage />,
+          },
+          {
+            path: 'turmas-professor/:classroomId/aulas/:lessonId/secoes/:sectionId',
+            element: <DetalhesSecaoProfessorPage />,
           },
           {
             path: 'editar-perfil',
