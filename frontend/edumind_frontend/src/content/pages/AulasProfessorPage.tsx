@@ -5,7 +5,7 @@ import { Link, useParams } from 'react-router-dom'
 import { ProfessorSidebar, TemporaryMessage } from '../../components'
 import { getAccessToken } from '../../features/auth'
 import type { CreateLessonRequest, Lesson } from '../../models'
-import { createLesson, getProfessorLessons } from '../../services'
+import { createLesson, getProfessorLessons, updateLesson } from '../../services'
 import {
   createTemporaryMessage,
   TEMPORARY_MESSAGE_DURATION,
@@ -28,12 +28,14 @@ export default function AulasProfessorPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false)
+  const [editingLesson, setEditingLesson] = useState<Lesson | null>(null)
   const [lessonForm, setLessonForm] = useState<CreateLessonRequest>(initialLessonForm)
   const [formErrorMessage, setFormErrorMessage] = useState<string | null>(null)
   const [isCreating, setIsCreating] = useState(false)
   const [temporaryMessage, setTemporaryMessage] = useState<TemporaryMessageData | null>(null)
 
   const openCreateForm = () => {
+    setEditingLesson(null)
     setLessonForm({
       ...initialLessonForm,
       ordem: lessons.length + 1,
@@ -48,8 +50,21 @@ export default function AulasProfessorPage() {
     }
 
     setIsCreateFormOpen(false)
+    setEditingLesson(null)
     setLessonForm(initialLessonForm)
     setFormErrorMessage(null)
+  }
+
+  const openEditForm = (lesson: Lesson) => {
+    setEditingLesson(lesson)
+    setLessonForm({
+      titulo: lesson.titulo,
+      descricao: lesson.descricao,
+      ordem: lesson.ordem,
+      ativo: lesson.ativo,
+    })
+    setFormErrorMessage(null)
+    setIsCreateFormOpen(true)
   }
 
   const handleFormChange = (
@@ -70,7 +85,7 @@ export default function AulasProfessorPage() {
     }))
   }
 
-  const handleCreateLesson = async (event: FormEvent<HTMLFormElement>) => {
+  const handleLessonSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     if (isCreating) {
@@ -95,7 +110,7 @@ export default function AulasProfessorPage() {
 
     const token = getAccessToken()
     if (!token) {
-      setFormErrorMessage('Sua sessão expirou. Entre novamente para criar a aula.')
+      setFormErrorMessage('Sua sessão expirou. Entre novamente para salvar a aula.')
       return
     }
 
@@ -103,22 +118,36 @@ export default function AulasProfessorPage() {
       setIsCreating(true)
       setFormErrorMessage(null)
 
-      const createdLesson = await createLesson(
-        parsedClassroomId,
-        { ...lessonForm, titulo: lessonForm.titulo.trim() },
-        token,
-      )
+      const payload = { ...lessonForm, titulo: lessonForm.titulo.trim() }
 
-      setLessons((currentLessons) => [...currentLessons, createdLesson].sort(
-        (firstLesson, secondLesson) => firstLesson.ordem - secondLesson.ordem,
-      ))
+      if (editingLesson) {
+        const updatedLesson = await updateLesson(
+          parsedClassroomId,
+          editingLesson.id,
+          payload,
+          token,
+        )
+
+        setLessons((currentLessons) => currentLessons
+          .map((lesson) => lesson.id === updatedLesson.id ? updatedLesson : lesson)
+          .sort((firstLesson, secondLesson) => firstLesson.ordem - secondLesson.ordem))
+        setTemporaryMessage(createTemporaryMessage('success', 'Aula atualizada com sucesso.'))
+      } else {
+        const createdLesson = await createLesson(parsedClassroomId, payload, token)
+
+        setLessons((currentLessons) => [...currentLessons, createdLesson].sort(
+          (firstLesson, secondLesson) => firstLesson.ordem - secondLesson.ordem,
+        ))
+        setTemporaryMessage(createTemporaryMessage('success', 'Aula criada com sucesso.'))
+      }
+
       setIsCreateFormOpen(false)
+      setEditingLesson(null)
       setLessonForm(initialLessonForm)
-      setTemporaryMessage(createTemporaryMessage('success', 'Aula criada com sucesso.'))
     } catch (error) {
       const message = error instanceof ApiRequestError
         ? error.message
-        : 'Não foi possível criar a aula. Tente novamente.'
+        : 'Não foi possível salvar a aula. Tente novamente.'
       setFormErrorMessage(message)
       setTemporaryMessage(createTemporaryMessage('error', message))
     } finally {
@@ -237,11 +266,7 @@ export default function AulasProfessorPage() {
           {!isLoading && !errorMessage && (
             <div className="aulas-professor-grid">
               {lessons.map((lesson) => (
-                <Link
-                  key={lesson.id}
-                  to={`/app/turmas-professor/${classroomId}/aulas/${lesson.id}`}
-                  className="aula-professor-card aula-professor-card-link"
-                >
+                <article key={lesson.id} className="aula-professor-card">
                   <div className="aula-professor-card-banner">
                     <span>Aula {lesson.ordem}</span>
                     <span className={lesson.ativo ? 'aula-professor-status' : 'aula-professor-status inactive'}>
@@ -249,10 +274,22 @@ export default function AulasProfessorPage() {
                     </span>
                   </div>
                   <div className="aula-professor-card-content">
-                    <h3>{lesson.titulo}</h3>
-                    <p>{lesson.descricao || 'Sem descrição cadastrada.'}</p>
+                    <Link
+                      to={`/app/turmas-professor/${classroomId}/aulas/${lesson.id}`}
+                      className="aula-professor-card-link"
+                    >
+                      <h3>{lesson.titulo}</h3>
+                      <p>{lesson.descricao || 'Sem descrição cadastrada.'}</p>
+                    </Link>
+                    <button
+                      type="button"
+                      className="aula-professor-edit-button"
+                      onClick={() => openEditForm(lesson)}
+                    >
+                      Editar aula
+                    </button>
                   </div>
-                </Link>
+                </article>
               ))}
 
               <article className="aula-professor-card aula-professor-card-empty">
@@ -286,8 +323,10 @@ export default function AulasProfessorPage() {
           >
             <div className="aula-create-heading">
               <div>
-                <p>Nova aula</p>
-                <h2 id="aula-create-title">Organize o conteúdo da turma</h2>
+                <p>{editingLesson ? 'Editar aula' : 'Nova aula'}</p>
+                <h2 id="aula-create-title">
+                  {editingLesson ? 'Atualize os dados da aula' : 'Organize o conteúdo da turma'}
+                </h2>
               </div>
               <button
                 type="button"
@@ -300,7 +339,7 @@ export default function AulasProfessorPage() {
               </button>
             </div>
 
-            <form className="aula-create-form" onSubmit={handleCreateLesson}>
+            <form className="aula-create-form" onSubmit={handleLessonSubmit}>
               <label>
                 <span>Título da aula</span>
                 <input
@@ -359,7 +398,7 @@ export default function AulasProfessorPage() {
                   Cancelar
                 </button>
                 <button type="submit" className="aula-create-submit" disabled={isCreating}>
-                  {isCreating ? 'Salvando...' : 'Salvar aula'}
+                  {isCreating ? 'Salvando...' : editingLesson ? 'Salvar alterações' : 'Salvar aula'}
                 </button>
               </div>
             </form>

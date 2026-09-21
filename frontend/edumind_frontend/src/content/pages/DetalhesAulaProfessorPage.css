@@ -37,6 +37,27 @@
   line-height: 1.15;
 }
 
+.detalhes-aula-professor-header-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.detalhes-aula-professor-preview-link {
+  padding: 10px 14px;
+  border: 1px solid #197abe;
+  border-radius: 5px;
+  color: #197abe;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.detalhes-aula-professor-preview-link:hover {
+  background: #e9f6fc;
+}
+
 .detalhes-aula-professor-header > p:last-child,
 .detalhes-aula-professor-sections-heading > div > p:last-child,
 .detalhes-aula-professor-summary p,
@@ -404,6 +425,11 @@
 
   .detalhes-aula-professor-summary {
     align-items: flex-start;
+  }
+
+  .detalhes-aula-professor-header-heading {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .detalhes-aula-professor-sections-heading {

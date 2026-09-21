@@ -1,0 +1,146 @@
+.turmas-aluno-page {
+  min-height: 100%;
+  padding: 40px 48px;
+  background: #eef7ff;
+  color: #082c58;
+}
+
+.turmas-aluno-header {
+  margin-bottom: 28px;
+}
+
+.turmas-aluno-eyebrow {
+  margin: 0 0 6px;
+  color: #1175c6;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.turmas-aluno-header h1,
+.turmas-aluno-list-heading h2,
+.turmas-aluno-empty-state h3 {
+  margin: 0;
+}
+
+.turmas-aluno-header h1 {
+  font-size: 2rem;
+}
+
+.turmas-aluno-header > div > p:last-child {
+  margin: 8px 0 0;
+  color: #52749a;
+}
+
+.turmas-aluno-summary {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 18px;
+  border: 1px solid #c9e4f7;
+  border-radius: 8px;
+  background: #f8fdff;
+}
+
+.turmas-aluno-summary-icon,
+.turmas-aluno-empty-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #d9f2fa;
+  color: #087dc1;
+}
+
+.turmas-aluno-summary-icon {
+  width: 36px;
+  height: 36px;
+}
+
+.turmas-aluno-summary strong {
+  font-size: 0.95rem;
+}
+
+.turmas-aluno-summary p,
+.turmas-aluno-empty-state p {
+  margin: 6px 0 0;
+  color: #52749a;
+  line-height: 1.45;
+}
+
+.turmas-aluno-list-section {
+  margin-top: 32px;
+}
+
+.turmas-aluno-list-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.turmas-aluno-list-heading h2 {
+  font-size: 1rem;
+}
+
+.turmas-aluno-list-heading span {
+  color: #52749a;
+  font-size: 0.85rem;
+}
+
+.turmas-aluno-empty-state {
+  display: grid;
+  justify-items: center;
+  max-width: 440px;
+  padding: 44px 32px;
+  border: 1px dashed #9fcdea;
+  border-radius: 8px;
+  background: #fbfdff;
+  text-align: center;
+}
+
+.turmas-aluno-empty-icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+  font-size: 1.6rem;
+}
+
+.turmas-aluno-empty-state p {
+  max-width: 310px;
+}
+
+.turmas-aluno-empty-state button {
+  margin-top: 20px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 6px;
+  background: #d7e5ef;
+  color: #69829b;
+  cursor: not-allowed;
+  font-weight: 700;
+}
+
+.turmas-aluno-footer {
+  margin-top: 36px;
+}
+
+.turmas-aluno-footer a {
+  color: #087dc1;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+@media (max-width: 720px) {
+  .turmas-aluno-page {
+    padding: 28px 20px;
+  }
+
+  .turmas-aluno-list-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

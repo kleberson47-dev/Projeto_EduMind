@@ -27,6 +27,7 @@ const LoginPage = loader(
 const CriarContaPage = loader(lazy(() => import('./content/pages/CriarConta')))
 const EsqueceuSenhaPage = loader(lazy(() => import('./content/pages/EsqueceuSenha')))
 const IndexAlunoPage = loader(lazy(() => import('./content/pages/IndexAlunoPage')))
+const TurmasAlunoPage = loader(lazy(() => import('./content/pages/TurmasAlunoPage')))
 const IndexProfessorPage = loader(lazy(() => import('./content/pages/IndexProfessorPage')))
 const TurmasProfessorPage = loader(lazy(() => import('./content/pages/TurmasProfessorPage')))
 const DetalhesTurmaProfessorPage = loader(
@@ -35,6 +36,9 @@ const DetalhesTurmaProfessorPage = loader(
 const AulasProfessorPage = loader(lazy(() => import('./content/pages/AulasProfessorPage')))
 const DetalhesAulaProfessorPage = loader(
   lazy(() => import('./content/pages/DetalhesAulaProfessorPage')),
+)
+const VisualizarAulaProfessorPage = loader(
+  lazy(() => import('./content/pages/VisualizarAulaProfessorPage')),
 )
 const DetalhesSecaoProfessorPage = loader(
   lazy(() => import('./content/pages/DetalhesSecaoProfessorPage')),
@@ -79,6 +83,10 @@ export const appRouter = createBrowserRouter([
             element: <IndexAlunoPage />,
           },
           {
+            path: 'turmas-aluno',
+            element: <TurmasAlunoPage />,
+          },
+          {
             path: 'inicio_professor',
             element: <IndexProfessorPage />,
           },
@@ -97,6 +105,10 @@ export const appRouter = createBrowserRouter([
           {
             path: 'turmas-professor/:classroomId/aulas/:lessonId',
             element: <DetalhesAulaProfessorPage />,
+          },
+          {
+            path: 'turmas-professor/:classroomId/aulas/:lessonId/visualizar',
+            element: <VisualizarAulaProfessorPage />,
           },
           {
             path: 'turmas-professor/:classroomId/aulas/:lessonId/secoes/:sectionId',

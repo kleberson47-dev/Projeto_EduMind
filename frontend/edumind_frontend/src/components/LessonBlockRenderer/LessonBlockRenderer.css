@@ -1,0 +1,64 @@
+.lesson-block-renderer {
+  padding: 22px;
+  border: 1px solid #dce7ef;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.lesson-block-renderer h3 {
+  margin: 0 0 16px;
+  color: #102f52;
+  font-size: 1.15rem;
+}
+
+.lesson-block-renderer-text,
+.lesson-block-renderer-empty {
+  margin: 0;
+  color: #344f6a;
+  line-height: 1.7;
+  white-space: pre-line;
+}
+
+.lesson-block-renderer-empty {
+  color: #698298;
+}
+
+.lesson-block-renderer-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 22px;
+  color: #344f6a;
+  line-height: 1.6;
+}
+
+.lesson-block-renderer-image,
+.lesson-block-renderer-video {
+  display: block;
+  width: 100%;
+  max-height: 520px;
+  border-radius: 5px;
+  object-fit: contain;
+}
+
+.lesson-block-renderer-table-wrapper {
+  overflow-x: auto;
+}
+
+.lesson-block-renderer-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #344f6a;
+}
+
+.lesson-block-renderer-table td {
+  padding: 10px 12px;
+  border: 1px solid #dce7ef;
+  text-align: left;
+}
+
+.lesson-block-renderer-table tr:first-child td {
+  background: #e9f5fb;
+  color: #173f63;
+  font-weight: 700;
+}

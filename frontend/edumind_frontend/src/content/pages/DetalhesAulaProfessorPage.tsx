@@ -228,7 +228,15 @@ export default function DetalhesAulaProfessorPage() {
       <main className="detalhes-aula-professor-page">
         <header className="detalhes-aula-professor-header">
           <p className="detalhes-aula-professor-eyebrow">Conteúdo da aula</p>
-          <h1>Organize sua aula</h1>
+          <div className="detalhes-aula-professor-header-heading">
+            <h1>Organize sua aula</h1>
+            <Link
+              to={`/app/turmas-professor/${classroomId}/aulas/${lessonId}/visualizar`}
+              className="detalhes-aula-professor-preview-link"
+            >
+              Visualizar aula
+            </Link>
+          </div>
           <p>
             Crie seções para estruturar o conteúdo e adicione blocos de texto,
             imagens, vídeos ou tabelas em cada uma delas.

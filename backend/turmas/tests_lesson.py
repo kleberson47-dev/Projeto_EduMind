@@ -85,6 +85,36 @@ class ProfessorLessonViewTests(TestCase):
         self.assertEqual(response.data["titulo"], "Introdução ao módulo")
         self.assertEqual(response.data["turma"], self.classroom.id)
 
+    def test_professor_can_update_lesson_for_classroom(self):
+        lesson = Lesson.objects.create(
+            turma=self.classroom,
+            titulo="Aula inicial",
+            descricao="Descrição inicial.",
+            ordem=1,
+            ativo=True,
+        )
+        self.client.force_authenticate(user=self.professor)
+        url = reverse(
+            "classrooms-professor-lesson-detail",
+            args=[self.classroom.id, lesson.id],
+        )
+
+        response = self.client.patch(
+            url,
+            {
+                "titulo": "Aula atualizada",
+                "descricao": "Descrição atualizada.",
+                "ordem": 2,
+                "ativo": False,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["titulo"], "Aula atualizada")
+        self.assertEqual(response.data["ordem"], 2)
+        self.assertFalse(response.data["ativo"])
+
 
 class StudentLessonViewTests(TestCase):
     def setUp(self):

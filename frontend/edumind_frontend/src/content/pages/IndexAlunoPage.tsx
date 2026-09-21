@@ -11,6 +11,7 @@ type NavItem = {
   label: string
   active?: boolean
   icon: string
+  path?: string
 }
 
 type Stat = {
@@ -28,7 +29,7 @@ type Deadline = {
 
 const navItems: NavItem[] = [
   { label: 'Inicio', active: true, icon: '▣' },
-  { label: 'Turmas', icon: '◫' },
+  { label: 'Turmas', icon: '◫', path: '/app/turmas-aluno' },
   { label: 'Agenda', icon: '◫' },
   { label: 'Atividades', icon: '≋' },
   { label: 'Configurações', icon: '⚙' },
@@ -148,7 +149,12 @@ export default function IndexAlunoPage() {
 
         <nav className="sidebar-nav" aria-label="Menu lateral">
           {navItems.map((item) => (
-            <button key={item.label} type="button" className={item.active ? 'nav-item active' : 'nav-item'}>
+            <button
+              key={item.label}
+              type="button"
+              className={item.active ? 'nav-item active' : 'nav-item'}
+              onClick={item.path ? () => navigate(item.path ?? '/') : undefined}
+            >
               <span className="nav-icon">{item.icon}</span>
               <span>{item.label}</span>
             </button>

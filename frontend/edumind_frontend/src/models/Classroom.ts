@@ -150,6 +150,13 @@ export interface CreateLessonRequest {
   ativo?: boolean
 }
 
+export interface UpdateLessonRequest {
+  titulo?: string
+  descricao?: string
+  ordem?: number
+  ativo?: boolean
+}
+
 export interface CreateLessonSectionRequest {
   titulo: string
   descricao?: string

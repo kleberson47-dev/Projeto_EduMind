@@ -200,6 +200,22 @@ class ProfessorClassroomLessonListCreateView(generics.ListCreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+# Exibe e atualiza uma aula pertencente ao professor logado.
+class ProfessorLessonDetailUpdateView(generics.RetrieveUpdateAPIView):
+    serializer_class = LessonSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = "id"
+    lookup_url_kwarg = "lesson_id"
+
+    def get_queryset(self):
+        if getattr(self.request.user, "role", None) != "professor":
+            return Lesson.objects.none()
+        return Lesson.objects.filter(
+            turma_id=self.kwargs.get("id"),
+            turma__professor=self.request.user,
+        )
+
+
 # Lista e cria seções de uma aula pertencente ao professor logado.
 class ProfessorLessonSectionListCreateView(generics.ListCreateAPIView):
     serializer_class = LessonSectionSerializer
