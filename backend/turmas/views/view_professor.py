@@ -254,6 +254,23 @@ class ProfessorLessonSectionListCreateView(generics.ListCreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+# Exibe e atualiza uma seção pertencente ao professor logado.
+class ProfessorLessonSectionDetailUpdateView(generics.RetrieveUpdateAPIView):
+    serializer_class = LessonSectionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = "id"
+    lookup_url_kwarg = "section_id"
+
+    def get_queryset(self):
+        if getattr(self.request.user, "role", None) != "professor":
+            return LessonSection.objects.none()
+        return LessonSection.objects.filter(
+            aula_id=self.kwargs.get("lesson_id"),
+            aula__turma_id=self.kwargs.get("id"),
+            aula__turma__professor=self.request.user,
+        )
+
+
 # Lista e cria blocos de conteúdo dentro de uma seção pertencente ao professor logado.
 class ProfessorLessonBlockListCreateView(generics.ListCreateAPIView):
     serializer_class = LessonBlockSerializer
@@ -292,3 +309,21 @@ class ProfessorLessonBlockListCreateView(generics.ListCreateAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save(secao=section)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+# Exibe e atualiza um bloco de conteúdo pertencente ao professor logado.
+class ProfessorLessonBlockDetailUpdateView(generics.RetrieveUpdateAPIView):
+    serializer_class = LessonBlockSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = "id"
+    lookup_url_kwarg = "block_id"
+
+    def get_queryset(self):
+        if getattr(self.request.user, "role", None) != "professor":
+            return LessonBlock.objects.none()
+        return LessonBlock.objects.filter(
+            secao_id=self.kwargs.get("section_id"),
+            secao__aula_id=self.kwargs.get("lesson_id"),
+            secao__aula__turma_id=self.kwargs.get("id"),
+            secao__aula__turma__professor=self.request.user,
+        )

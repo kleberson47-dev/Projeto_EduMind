@@ -426,6 +426,36 @@ class ProfessorLessonSectionViewTests(TestCase):
         self.assertEqual(response.data["titulo"], "Introdução teórica")
         self.assertEqual(response.data["aula"], self.lesson.id)
 
+    def test_professor_can_update_section_for_lesson(self):
+        section = LessonSection.objects.create(
+            aula=self.lesson,
+            titulo="Seção inicial",
+            descricao="Descrição antiga.",
+            ordem=1,
+            ativo=True,
+        )
+        self.client.force_authenticate(user=self.professor)
+        url = reverse(
+            "classrooms-professor-section-detail",
+            args=[self.classroom.id, self.lesson.id, section.id],
+        )
+
+        response = self.client.patch(
+            url,
+            {
+                "titulo": "Seção atualizada",
+                "descricao": "Descrição nova.",
+                "ordem": 2,
+                "ativo": False,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["titulo"], "Seção atualizada")
+        self.assertEqual(response.data["descricao"], "Descrição nova.")
+        self.assertFalse(response.data["ativo"])
+
 
 class ProfessorLessonBlockViewTests(TestCase):
     def setUp(self):
@@ -483,3 +513,34 @@ class ProfessorLessonBlockViewTests(TestCase):
         self.assertEqual(response.data["titulo"], "Texto explicativo")
         self.assertEqual(response.data["secao"], self.section.id)
         self.assertEqual(response.data["tipo"], LessonBlock.TIPO_TEXTO)
+
+    def test_professor_can_update_block_for_section(self):
+        block = LessonBlock.objects.create(
+            secao=self.section,
+            tipo=LessonBlock.TIPO_TEXTO,
+            titulo="Texto original",
+            conteudo="Conteúdo antigo.",
+            ordem=1,
+            ativo=True,
+        )
+        self.client.force_authenticate(user=self.professor)
+        url = reverse(
+            "classrooms-professor-block-detail",
+            args=[self.classroom.id, self.lesson.id, self.section.id, block.id],
+        )
+
+        response = self.client.patch(
+            url,
+            {
+                "titulo": "Texto atualizado",
+                "conteudo": "Conteúdo novo.",
+                "ordem": 2,
+                "ativo": False,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["titulo"], "Texto atualizado")
+        self.assertEqual(response.data["conteudo"], "Conteúdo novo.")
+        self.assertFalse(response.data["ativo"])

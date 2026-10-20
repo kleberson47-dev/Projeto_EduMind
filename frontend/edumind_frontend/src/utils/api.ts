@@ -27,10 +27,19 @@ export const API_ENDPOINTS = {
 			`/classrooms/${id}/lessons/${lessonId}/`,
 		professorSections: (id: number, lessonId: number) =>
 			`/classrooms/${id}/lessons/${lessonId}/sections/`,
+		professorSectionDetail: (id: number, lessonId: number, sectionId: number) =>
+			`/classrooms/${id}/lessons/${lessonId}/sections/${sectionId}/`,
 		studentSections: (id: number, lessonId: number) =>
 			`/classrooms/${id}/lessons/${lessonId}/sections/student/`,
 		professorBlocks: (id: number, lessonId: number, sectionId: number) =>
 			`/classrooms/${id}/lessons/${lessonId}/sections/${sectionId}/blocks/`,
+		professorBlockDetail: (
+			id: number,
+			lessonId: number,
+			sectionId: number,
+			blockId: number,
+		) =>
+			`/classrooms/${id}/lessons/${lessonId}/sections/${sectionId}/blocks/${blockId}/`,
 		studentBlocks: (id: number, lessonId: number, sectionId: number) =>
 			`/classrooms/${id}/lessons/${lessonId}/sections/${sectionId}/blocks/student/`,
 	},

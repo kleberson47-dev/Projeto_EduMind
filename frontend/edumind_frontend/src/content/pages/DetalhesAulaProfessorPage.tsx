@@ -8,6 +8,7 @@ import type { CreateLessonSectionRequest, LessonSection } from '../../models'
 import {
   createLessonSection,
   getProfessorLessonSections,
+  updateLessonSection,
 } from '../../services'
 import {
   createTemporaryMessage,
@@ -32,6 +33,7 @@ export default function DetalhesAulaProfessorPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSectionFormOpen, setIsSectionFormOpen] = useState(false)
+  const [editingSection, setEditingSection] = useState<LessonSection | null>(null)
   const [sectionForm, setSectionForm] = useState<CreateLessonSectionRequest>(
     initialSectionForm,
   )
@@ -104,13 +106,34 @@ export default function DetalhesAulaProfessorPage() {
   }, [classroomId, lessonId])
 
   const openSectionForm = () => {
-    setSectionForm(initialSectionForm)
+    setEditingSection(null)
+    setSectionForm({
+      ...initialSectionForm,
+      ordem: sections.length + 1,
+    })
+    setSectionFormError(null)
+    setIsSectionFormOpen(true)
+  }
+
+  const openEditSectionForm = (section: LessonSection) => {
+    setEditingSection(section)
+    setSectionForm({
+      titulo: section.titulo,
+      descricao: section.descricao,
+      ordem: section.ordem,
+      ativo: section.ativo,
+    })
     setSectionFormError(null)
     setIsSectionFormOpen(true)
   }
 
   const closeSectionForm = () => {
+    if (isCreatingSection) {
+      return
+    }
+
     setIsSectionFormOpen(false)
+    setEditingSection(null)
     setSectionForm(initialSectionForm)
     setSectionFormError(null)
   }
@@ -166,7 +189,7 @@ export default function DetalhesAulaProfessorPage() {
     }
 
     if (!token) {
-      setSectionFormError('Sua sessão expirou. Entre novamente para criar a seção.')
+      setSectionFormError('Sua sessão expirou. Entre novamente para salvar a seção.')
       return
     }
 
@@ -174,30 +197,52 @@ export default function DetalhesAulaProfessorPage() {
       setIsCreatingSection(true)
       setSectionFormError(null)
 
-      const createdSection = await createLessonSection(
-        parsedClassroomId,
-        parsedLessonId,
-        {
-          ...sectionForm,
-          titulo: sectionForm.titulo.trim(),
-        },
-        token,
-      )
+      const payload = {
+        ...sectionForm,
+        titulo: sectionForm.titulo.trim(),
+      }
 
-      setSections((currentSections) =>
-        [...currentSections, createdSection].sort((firstSection, secondSection) =>
-          firstSection.ordem - secondSection.ordem,
-        ),
-      )
-      closeSectionForm()
-      setTemporaryMessage(
-        createTemporaryMessage('success', 'Seção criada com sucesso.'),
-      )
+      if (editingSection) {
+        const updatedSection = await updateLessonSection(
+          parsedClassroomId,
+          parsedLessonId,
+          editingSection.id,
+          payload,
+          token,
+        )
+
+        setSections((currentSections) => currentSections
+          .map((section) => section.id === updatedSection.id ? updatedSection : section)
+          .sort((firstSection, secondSection) => firstSection.ordem - secondSection.ordem))
+        setTemporaryMessage(
+          createTemporaryMessage('success', 'Seção atualizada com sucesso.'),
+        )
+      } else {
+        const createdSection = await createLessonSection(
+          parsedClassroomId,
+          parsedLessonId,
+          payload,
+          token,
+        )
+
+        setSections((currentSections) =>
+          [...currentSections, createdSection].sort((firstSection, secondSection) =>
+            firstSection.ordem - secondSection.ordem,
+          ),
+        )
+        setTemporaryMessage(
+          createTemporaryMessage('success', 'Seção criada com sucesso.'),
+        )
+      }
+
+      setIsSectionFormOpen(false)
+      setEditingSection(null)
+      setSectionForm(initialSectionForm)
     } catch (error) {
       const message =
         error instanceof ApiRequestError
           ? error.message
-          : 'Não foi possível criar a seção. Tente novamente.'
+          : 'Não foi possível salvar a seção. Tente novamente.'
 
       setSectionFormError(message)
       setTemporaryMessage(createTemporaryMessage('error', message))
@@ -279,23 +324,34 @@ export default function DetalhesAulaProfessorPage() {
           {!isLoading && !errorMessage && (
             <div className="detalhes-aula-professor-sections-grid">
               {sections.map((section) => (
-                <Link
+                <article
                   key={section.id}
-                  to={`/app/turmas-professor/${classroomId}/aulas/${lessonId}/secoes/${section.id}`}
-                  className="detalhes-aula-professor-section-card detalhes-aula-professor-section-card-link"
+                  className="detalhes-aula-professor-section-card"
                 >
-                  <div className="detalhes-aula-professor-section-card-heading">
-                    <span>Seção {section.ordem}</span>
-                    <span className={section.ativo ? 'detalhes-aula-professor-status' : 'detalhes-aula-professor-status inactive'}>
-                      {section.ativo ? 'Ativa' : 'Inativa'}
+                  <Link
+                    to={`/app/turmas-professor/${classroomId}/aulas/${lessonId}/secoes/${section.id}`}
+                    className="detalhes-aula-professor-section-card-link"
+                  >
+                    <div className="detalhes-aula-professor-section-card-heading">
+                      <span>Seção {section.ordem}</span>
+                      <span className={section.ativo ? 'detalhes-aula-professor-status' : 'detalhes-aula-professor-status inactive'}>
+                        {section.ativo ? 'Ativa' : 'Inativa'}
+                      </span>
+                    </div>
+                    <h3>{section.titulo}</h3>
+                    <p>{section.descricao || 'Sem descrição cadastrada.'}</p>
+                    <span className="detalhes-aula-professor-section-card-footer">
+                      {section.blocos.length} blocos de conteúdo
                     </span>
-                  </div>
-                  <h3>{section.titulo}</h3>
-                  <p>{section.descricao || 'Sem descrição cadastrada.'}</p>
-                  <span className="detalhes-aula-professor-section-card-footer">
-                    {section.blocos.length} blocos de conteúdo
-                  </span>
-                </Link>
+                  </Link>
+                  <button
+                    type="button"
+                    className="detalhes-aula-professor-edit-button"
+                    onClick={() => openEditSectionForm(section)}
+                  >
+                    Editar seção
+                  </button>
+                </article>
               ))}
 
               <article className="detalhes-aula-professor-empty-card">
@@ -318,14 +374,17 @@ export default function DetalhesAulaProfessorPage() {
             >
               <div className="detalhes-aula-professor-modal-heading">
                 <div>
-                  <p>Nova seção</p>
-                  <h2 id="nova-secao-title">Organize o próximo tema</h2>
+                  <p>{editingSection ? 'Editar seção' : 'Nova seção'}</p>
+                  <h2 id="nova-secao-title">
+                    {editingSection ? 'Atualize os dados da seção' : 'Organize o próximo tema'}
+                  </h2>
                 </div>
                 <button
                   type="button"
                   className="detalhes-aula-professor-close-button"
                   onClick={closeSectionForm}
-                  aria-label="Fechar formulário de nova seção"
+                  aria-label="Fechar formulário de seção"
+                  disabled={isCreatingSection}
                 >
                   ×
                 </button>
@@ -386,7 +445,9 @@ export default function DetalhesAulaProfessorPage() {
                     Cancelar
                   </button>
                   <button type="submit" disabled={isCreatingSection}>
-                    {isCreatingSection ? 'Criando seção...' : 'Criar seção'}
+                    {isCreatingSection
+                      ? 'Salvando...'
+                      : editingSection ? 'Salvar alterações' : 'Criar seção'}
                   </button>
                 </div>
               </form>

@@ -164,8 +164,26 @@ export interface CreateLessonSectionRequest {
   ativo?: boolean
 }
 
+export interface UpdateLessonSectionRequest {
+  titulo?: string
+  descricao?: string
+  ordem?: number
+  ativo?: boolean
+}
+
 export interface CreateLessonBlockRequest {
   tipo: LessonBlockType
+  titulo?: string
+  conteudo?: string
+  url_imagem?: string
+  url_video?: string
+  tabela_json?: unknown
+  ordem?: number
+  ativo?: boolean
+}
+
+export interface UpdateLessonBlockRequest {
+  tipo?: LessonBlockType
   titulo?: string
   conteudo?: string
   url_imagem?: string

@@ -16,7 +16,9 @@ import type {
   LessonSection,
   UpdateClassroomRequest,
   UpdateClassroomResponse,
+  UpdateLessonBlockRequest,
   UpdateLessonRequest,
+  UpdateLessonSectionRequest,
 } from '../models/Classroom'
 import { API_ENDPOINTS } from '../utils/api'
 import { requestJson } from '../utils/requests'
@@ -230,6 +232,19 @@ export async function createLessonSection(
   )
 }
 
+export async function updateLessonSection(
+  classroomId: number,
+  lessonId: number,
+  sectionId: number,
+  payload: UpdateLessonSectionRequest,
+  token: string,
+): Promise<LessonSection> {
+  return requestJson<LessonSection>(
+    API_ENDPOINTS.classrooms.professorSectionDetail(classroomId, lessonId, sectionId),
+    { method: 'PATCH', body: payload, token },
+  )
+}
+
 export async function getStudentLessonSections(
   classroomId: number,
   lessonId: number,
@@ -263,6 +278,20 @@ export async function createLessonBlock(
   return requestJson<LessonBlock>(
     API_ENDPOINTS.classrooms.professorBlocks(classroomId, lessonId, sectionId),
     { method: 'POST', body: payload, token },
+  )
+}
+
+export async function updateLessonBlock(
+  classroomId: number,
+  lessonId: number,
+  sectionId: number,
+  blockId: number,
+  payload: UpdateLessonBlockRequest,
+  token: string,
+): Promise<LessonBlock> {
+  return requestJson<LessonBlock>(
+    API_ENDPOINTS.classrooms.professorBlockDetail(classroomId, lessonId, sectionId, blockId),
+    { method: 'PATCH', body: payload, token },
   )
 }
 

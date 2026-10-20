@@ -5,7 +5,7 @@ import { Link, useParams } from 'react-router-dom'
 import { ProfessorSidebar, TemporaryMessage } from '../../components'
 import { getAccessToken } from '../../features/auth'
 import type { CreateLessonBlockRequest, LessonBlock, LessonBlockType } from '../../models'
-import { createLessonBlock, getProfessorLessonBlocks } from '../../services'
+import { createLessonBlock, getProfessorLessonBlocks, updateLessonBlock } from '../../services'
 import {
   createTemporaryMessage,
   TEMPORARY_MESSAGE_DURATION,
@@ -47,6 +47,7 @@ export default function DetalhesSecaoProfessorPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isBlockFormOpen, setIsBlockFormOpen] = useState(false)
+  const [editingBlock, setEditingBlock] = useState<LessonBlock | null>(null)
   const [blockForm, setBlockForm] = useState<BlockFormState>(initialBlockForm)
   const [blockFormError, setBlockFormError] = useState<string | null>(null)
   const [isCreatingBlock, setIsCreatingBlock] = useState(false)
@@ -125,13 +126,40 @@ export default function DetalhesSecaoProfessorPage() {
   }, [classroomId, lessonId, sectionId])
 
   const openBlockForm = () => {
-    setBlockForm(initialBlockForm)
+    setEditingBlock(null)
+    setBlockForm({
+      ...initialBlockForm,
+      ordem: blocks.length + 1,
+    })
+    setBlockFormError(null)
+    setIsBlockFormOpen(true)
+  }
+
+  const openEditBlockForm = (block: LessonBlock) => {
+    const hasTableData = block.tabela_json !== null && block.tabela_json !== undefined
+
+    setEditingBlock(block)
+    setBlockForm({
+      tipo: block.tipo,
+      titulo: block.titulo,
+      conteudo: block.conteudo,
+      url_imagem: block.url_imagem,
+      url_video: block.url_video,
+      tabela_json: hasTableData ? JSON.stringify(block.tabela_json, null, 2) : '',
+      ordem: block.ordem,
+      ativo: block.ativo,
+    })
     setBlockFormError(null)
     setIsBlockFormOpen(true)
   }
 
   const closeBlockForm = () => {
+    if (isCreatingBlock) {
+      return
+    }
+
     setIsBlockFormOpen(false)
+    setEditingBlock(null)
     setBlockForm(initialBlockForm)
     setBlockFormError(null)
   }
@@ -211,7 +239,7 @@ export default function DetalhesSecaoProfessorPage() {
     }
 
     if (!token) {
-      setBlockFormError('Sua sessão expirou. Entre novamente para criar o bloco.')
+      setBlockFormError('Sua sessão expirou. Entre novamente para salvar o bloco.')
       return
     }
 
@@ -219,37 +247,60 @@ export default function DetalhesSecaoProfessorPage() {
       setIsCreatingBlock(true)
       setBlockFormError(null)
 
-      const createdBlock = await createLessonBlock(
-        parsedClassroomId,
-        parsedLessonId,
-        parsedSectionId,
-        {
-          tipo: blockForm.tipo,
-          titulo: blockForm.titulo?.trim() ?? '',
-          conteudo: blockForm.conteudo,
-          url_imagem: blockForm.url_imagem,
-          url_video: blockForm.url_video,
-          tabela_json: tableData,
-          ordem: blockForm.ordem,
-          ativo: blockForm.ativo,
-        },
-        token,
-      )
+      const payload: CreateLessonBlockRequest = {
+        tipo: blockForm.tipo,
+        titulo: blockForm.titulo?.trim() ?? '',
+        conteudo: blockForm.conteudo,
+        url_imagem: blockForm.url_imagem,
+        url_video: blockForm.url_video,
+        tabela_json: tableData,
+        ordem: blockForm.ordem,
+        ativo: blockForm.ativo,
+      }
 
-      setBlocks((currentBlocks) =>
-        [...currentBlocks, createdBlock].sort(
-          (firstBlock, secondBlock) => firstBlock.ordem - secondBlock.ordem,
-        ),
-      )
-      closeBlockForm()
-      setTemporaryMessage(
-        createTemporaryMessage('success', 'Bloco criado com sucesso.'),
-      )
+      if (editingBlock) {
+        const updatedBlock = await updateLessonBlock(
+          parsedClassroomId,
+          parsedLessonId,
+          parsedSectionId,
+          editingBlock.id,
+          payload,
+          token,
+        )
+
+        setBlocks((currentBlocks) => currentBlocks
+          .map((block) => block.id === updatedBlock.id ? updatedBlock : block)
+          .sort((firstBlock, secondBlock) => firstBlock.ordem - secondBlock.ordem))
+        setTemporaryMessage(
+          createTemporaryMessage('success', 'Bloco atualizado com sucesso.'),
+        )
+      } else {
+        const createdBlock = await createLessonBlock(
+          parsedClassroomId,
+          parsedLessonId,
+          parsedSectionId,
+          payload,
+          token,
+        )
+
+        setBlocks((currentBlocks) =>
+          [...currentBlocks, createdBlock].sort(
+            (firstBlock, secondBlock) => firstBlock.ordem - secondBlock.ordem,
+          ),
+        )
+        setTemporaryMessage(
+          createTemporaryMessage('success', 'Bloco criado com sucesso.'),
+        )
+      }
+
+      setIsBlockFormOpen(false)
+      setEditingBlock(null)
+      setBlockForm(initialBlockForm)
     } catch (error) {
       const message =
         error instanceof ApiRequestError
           ? error.message
-          : 'Não foi possível criar o bloco. Tente novamente.'
+          : 'Não foi possível salvar o bloco. Tente novamente.'
 
       setBlockFormError(message)
       setTemporaryMessage(createTemporaryMessage('error', message))
@@ -334,6 +385,13 @@ export default function DetalhesSecaoProfessorPage() {
                   <h3>{block.titulo || `Bloco de ${block.tipo}`}</h3>
                   <p>{block.conteudo || block.url_imagem || block.url_video || 'Conteúdo em tabela ou lista.'}</p>
                   <footer>Bloco {block.ordem}</footer>
+                  <button
+                    type="button"
+                    className="detalhes-secao-professor-edit-button"
+                    onClick={() => openEditBlockForm(block)}
+                  >
+                    Editar bloco
+                  </button>
                 </article>
               ))}
             </div>
@@ -350,8 +408,8 @@ export default function DetalhesSecaoProfessorPage() {
             >
               <header>
                 <div>
-                  <p>Novo conteúdo</p>
-                  <h2 id="novo-bloco-title">Criar bloco</h2>
+                  <p>{editingBlock ? 'Editar conteúdo' : 'Novo conteúdo'}</p>
+                  <h2 id="novo-bloco-title">{editingBlock ? 'Editar bloco' : 'Criar bloco'}</h2>
                 </div>
                 <button type="button" onClick={closeBlockForm} aria-label="Fechar formulário" disabled={isCreatingBlock}>×</button>
               </header>
@@ -415,7 +473,9 @@ export default function DetalhesSecaoProfessorPage() {
                 <footer>
                   <button type="button" onClick={closeBlockForm} disabled={isCreatingBlock}>Cancelar</button>
                   <button type="submit" disabled={isCreatingBlock}>
-                    {isCreatingBlock ? 'Salvando...' : 'Salvar bloco'}
+                    {isCreatingBlock
+                      ? 'Salvando...'
+                      : editingBlock ? 'Salvar alterações' : 'Salvar bloco'}
                   </button>
                 </footer>
               </form>

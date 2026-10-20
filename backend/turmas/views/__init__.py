@@ -16,7 +16,9 @@ from .view_professor import (
     ProfessorLessonDetailUpdateView,
     ProfessorClassroomLessonListCreateView,
     ProfessorClassroomListCreateView,
+    ProfessorLessonBlockDetailUpdateView,
     ProfessorLessonBlockListCreateView,
+    ProfessorLessonSectionDetailUpdateView,
     ProfessorLessonSectionListCreateView,
 )
 
@@ -36,6 +38,8 @@ __all__ = [
     "ProfessorLessonDetailUpdateView",
     "ProfessorClassroomLessonListCreateView",
     "ProfessorClassroomListCreateView",
+    "ProfessorLessonBlockDetailUpdateView",
     "ProfessorLessonBlockListCreateView",
+    "ProfessorLessonSectionDetailUpdateView",
     "ProfessorLessonSectionListCreateView",
 ]

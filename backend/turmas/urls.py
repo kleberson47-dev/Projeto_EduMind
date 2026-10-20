@@ -16,7 +16,9 @@ from .views import (
     ProfessorLessonDetailUpdateView,
     ProfessorClassroomLessonListCreateView,
     ProfessorClassroomListCreateView,
+    ProfessorLessonBlockDetailUpdateView,
     ProfessorLessonBlockListCreateView,
+    ProfessorLessonSectionDetailUpdateView,
     ProfessorLessonSectionListCreateView,
 )
 
@@ -40,8 +42,12 @@ urlpatterns = [
          ProfessorLessonDetailUpdateView.as_view(), name="classrooms-professor-lesson-detail"),
     path("classrooms/<int:id>/lessons/<int:lesson_id>/sections/",
          ProfessorLessonSectionListCreateView.as_view(), name="classrooms-professor-sections"),
+    path("classrooms/<int:id>/lessons/<int:lesson_id>/sections/<int:section_id>/",
+         ProfessorLessonSectionDetailUpdateView.as_view(), name="classrooms-professor-section-detail"),
     path("classrooms/<int:id>/lessons/<int:lesson_id>/sections/<int:section_id>/blocks/",
          ProfessorLessonBlockListCreateView.as_view(), name="classrooms-professor-blocks"),
+    path("classrooms/<int:id>/lessons/<int:lesson_id>/sections/<int:section_id>/blocks/<int:block_id>/",
+         ProfessorLessonBlockDetailUpdateView.as_view(), name="classrooms-professor-block-detail"),
     path("classrooms/<int:id>/lessons/student/",
          AlunoClassroomLessonListView.as_view(), name="classrooms-student-lessons"),
     path("classrooms/<int:id>/lessons/<int:lesson_id>/sections/student/",
