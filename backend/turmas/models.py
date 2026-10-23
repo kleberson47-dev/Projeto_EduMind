@@ -242,7 +242,15 @@ class LessonBlock(models.Model):
         max_length=20, choices=TIPOS_BLOCO, default=TIPO_TEXTO)
     titulo = models.CharField(max_length=255, blank=True, default="")
     conteudo = models.TextField(blank=True, default="")
+    arquivo_imagem = models.ImageField(
+        upload_to="aulas/imagens/%Y/%m/",
+        blank=True,
+    )
     url_imagem = models.URLField(blank=True, default="")
+    arquivo_video = models.FileField(
+        upload_to="aulas/videos/%Y/%m/",
+        blank=True,
+    )
     url_video = models.URLField(blank=True, default="")
     tabela_json = models.JSONField(blank=True, null=True, default=dict)
     ordem = models.PositiveIntegerField(default=1)
@@ -267,12 +275,25 @@ class LessonBlock(models.Model):
         if self.tipo == self.TIPO_TEXTO and not self.conteudo:
             raise ValidationError("Blocos de texto precisam de conteúdo.")
 
-        if self.tipo == self.TIPO_IMAGEM and not self.url_imagem:
-            raise ValidationError(
-                "Blocos de imagem precisam de URL da imagem.")
+        if self.tipo == self.TIPO_IMAGEM:
+            if not self.arquivo_imagem:
+                raise ValidationError(
+                    "Blocos de imagem precisam de um arquivo de imagem."
+                )
 
-        if self.tipo == self.TIPO_VIDEO and not self.url_video:
-            raise ValidationError("Blocos de vídeo precisam de URL do vídeo.")
+        if self.tipo == self.TIPO_VIDEO:
+            tem_arquivo = bool(self.arquivo_video)
+            tem_url = bool(self.url_video)
+
+            if tem_arquivo and tem_url:
+                raise ValidationError(
+                    "Blocos de vídeo não podem ter arquivo e URL ao mesmo tempo."
+                )
+
+            if not tem_arquivo and not tem_url:
+                raise ValidationError(
+                    "Blocos de vídeo precisam de um arquivo ou URL válidos."
+                )
 
         if self.tipo == self.TIPO_TABELA and not self.tabela_json:
             raise ValidationError(

@@ -3,6 +3,12 @@ from rest_framework import serializers
 from ..models import Lesson, LessonBlock, LessonSection
 
 
+MAX_SIZE_IMAGEM = 5 * 1024 * 1024
+MAX_SIZE_VIDEO = 100 * 1024 * 1024
+EXTENSOES_IMAGEM = {"jpg", "jpeg", "png", "gif", "webp"}
+EXTENSOES_VIDEO = {"mp4", "webm"}
+
+
 # Serializa cada bloco de conteúdo dentro de uma seção de aula.
 class LessonBlockSerializer(serializers.ModelSerializer):
     class Meta:
@@ -13,7 +19,9 @@ class LessonBlockSerializer(serializers.ModelSerializer):
             "tipo",
             "titulo",
             "conteudo",
+            "arquivo_imagem",
             "url_imagem",
+            "arquivo_video",
             "url_video",
             "tabela_json",
             "ordem",
@@ -27,6 +35,40 @@ class LessonBlockSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+    def validate_arquivo_imagem(self, value):
+        if value in (None, ""):
+            return value
+
+        extensao = value.name.rsplit(".", 1)[-1].lower()
+        if extensao not in EXTENSOES_IMAGEM:
+            raise serializers.ValidationError(
+                "Formato de imagem inválido. Use JPG, JPEG, PNG, GIF ou WEBP."
+            )
+
+        if value.size > MAX_SIZE_IMAGEM:
+            raise serializers.ValidationError(
+                "A imagem deve ter no máximo 5 MB."
+            )
+
+        return value
+
+    def validate_arquivo_video(self, value):
+        if value in (None, ""):
+            return value
+
+        extensao = value.name.rsplit(".", 1)[-1].lower()
+        if extensao not in EXTENSOES_VIDEO:
+            raise serializers.ValidationError(
+                "Formato de vídeo inválido. Use MP4 ou WEBM."
+            )
+
+        if value.size > MAX_SIZE_VIDEO:
+            raise serializers.ValidationError(
+                "O vídeo deve ter no máximo 100 MB."
+            )
+
+        return value
 
     def validate_tipo(self, value):
         tipos_validos = {tipo for tipo, _ in LessonBlock.TIPOS_BLOCO}
@@ -47,19 +89,30 @@ class LessonBlockSerializer(serializers.ModelSerializer):
                 )
 
         if tipo == LessonBlock.TIPO_IMAGEM:
-            url = attrs.get("url_imagem", getattr(
-                self.instance, "url_imagem", ""))
-            if not url:
+            arquivo = attrs.get(
+                "arquivo_imagem",
+                getattr(self.instance, "arquivo_imagem", None),
+            )
+            if not arquivo:
                 raise serializers.ValidationError(
-                    "Blocos de imagem precisam de uma URL válida."
+                    "Blocos de imagem precisam de um arquivo de imagem."
                 )
 
         if tipo == LessonBlock.TIPO_VIDEO:
-            url = attrs.get("url_video", getattr(
-                self.instance, "url_video", ""))
-            if not url:
+            arquivo = attrs.get(
+                "arquivo_video",
+                getattr(self.instance, "arquivo_video", None),
+            )
+            url = attrs.get("url_video", getattr(self.instance, "url_video", ""))
+
+            if arquivo and url:
                 raise serializers.ValidationError(
-                    "Blocos de vídeo precisam de uma URL válida."
+                    "Blocos de vídeo não podem ter arquivo e URL ao mesmo tempo."
+                )
+
+            if not arquivo and not url:
+                raise serializers.ValidationError(
+                    "Blocos de vídeo precisam de um arquivo ou URL válidos."
                 )
 
         if tipo == LessonBlock.TIPO_TABELA:
@@ -71,6 +124,18 @@ class LessonBlockSerializer(serializers.ModelSerializer):
                 )
 
         return attrs
+
+    def update(self, instance, validated_data):
+        arquivo_imagem = validated_data.get("arquivo_imagem")
+        arquivo_video = validated_data.get("arquivo_video")
+
+        if arquivo_imagem is not None and instance.arquivo_imagem:
+            instance.arquivo_imagem.delete(save=False)
+
+        if arquivo_video is not None and instance.arquivo_video:
+            instance.arquivo_video.delete(save=False)
+
+        return super().update(instance, validated_data)
 
 
 # Serializa cada seção de uma aula e inclui os blocos em ordem.

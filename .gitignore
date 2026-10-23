@@ -6,6 +6,9 @@ backend/ENV/
 backend/env.bak/
 backend/venv.bak/
 backend/accounts/tests.py
+backend/media/
+teste.png
+video_teste.mp4
 
 backend/__pycache__/
 backend/*.py[cod]

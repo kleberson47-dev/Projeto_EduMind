@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
@@ -254,6 +255,129 @@ class LessonBlockSerializerTests(TestCase):
         self.assertEqual(serializer.data["ordem"], 1)
         self.assertEqual(
             serializer.data["conteudo"], "Este é o conteúdo do bloco.")
+
+    def test_lesson_block_serializer_accepts_image_upload(self):
+        imagem_path = r"C:\Users\Kleberson\AppData\Roaming\Code\agentSessionData\041993dd-6dba-4c4b-b06f-511401c3df8b\attachments\d8b071a5-5349-439a-9951-cee1b3ae0918\teste.png"
+        with open(imagem_path, "rb") as arquivo:
+            imagem = SimpleUploadedFile(
+                "teste.png",
+                arquivo.read(),
+                content_type="image/png",
+            )
+
+        serializer = LessonBlockSerializer(
+            data={
+                "tipo": LessonBlock.TIPO_IMAGEM,
+                "titulo": "Imagem da aula",
+                "arquivo_imagem": imagem,
+                "ordem": 2,
+                "ativo": True,
+            }
+        )
+
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        bloco = serializer.save(secao=self.section)
+        self.assertTrue(bloco.arquivo_imagem)
+        self.assertEqual(bloco.tipo, LessonBlock.TIPO_IMAGEM)
+
+    def test_lesson_block_serializer_accepts_video_upload_and_video_url(self):
+        video_path = r"C:\Users\Kleberson\Desktop\Programação\meus_projetos\Projeto_EduMind\video_teste.mp4"
+        with open(video_path, "rb") as arquivo:
+            video_upload = SimpleUploadedFile(
+                "video_teste.mp4",
+                arquivo.read(),
+                content_type="video/mp4",
+            )
+
+        serializer_upload = LessonBlockSerializer(
+            data={
+                "tipo": LessonBlock.TIPO_VIDEO,
+                "titulo": "Vídeo em upload",
+                "arquivo_video": video_upload,
+                "ordem": 2,
+                "ativo": True,
+            }
+        )
+        self.assertTrue(serializer_upload.is_valid(), serializer_upload.errors)
+        bloco_upload = serializer_upload.save(secao=self.section)
+        self.assertTrue(bloco_upload.arquivo_video)
+
+        serializer_url = LessonBlockSerializer(
+            data={
+                "tipo": LessonBlock.TIPO_VIDEO,
+                "titulo": "Vídeo em link",
+                "url_video": "https://example.com/video.mp4",
+                "ordem": 3,
+                "ativo": True,
+            }
+        )
+        self.assertTrue(serializer_url.is_valid(), serializer_url.errors)
+        bloco_url = serializer_url.save(secao=self.section)
+        self.assertEqual(bloco_url.url_video, "https://example.com/video.mp4")
+
+    def test_lesson_block_serializer_rejects_video_with_file_and_url(self):
+        video_path = r"C:\Users\Kleberson\Desktop\Programação\meus_projetos\Projeto_EduMind\video_teste.mp4"
+        with open(video_path, "rb") as arquivo:
+            video = SimpleUploadedFile(
+                "video_teste.mp4",
+                arquivo.read(),
+                content_type="video/mp4",
+            )
+        serializer = LessonBlockSerializer(
+            data={
+                "tipo": LessonBlock.TIPO_VIDEO,
+                "titulo": "Vídeo inválido",
+                "arquivo_video": video,
+                "url_video": "https://example.com/video.mp4",
+                "ordem": 2,
+                "ativo": True,
+            }
+        )
+
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("non_field_errors", serializer.errors)
+
+    def test_lesson_block_serializer_updates_video_file_when_replaced(self):
+        video_path = r"C:\Users\Kleberson\Desktop\Programação\meus_projetos\Projeto_EduMind\video_teste.mp4"
+        with open(video_path, "rb") as arquivo:
+            arquivo_original = SimpleUploadedFile(
+                "video_teste.mp4",
+                arquivo.read(),
+                content_type="video/mp4",
+            )
+
+        block = LessonBlock.objects.create(
+            secao=self.section,
+            tipo=LessonBlock.TIPO_VIDEO,
+            titulo="Vídeo antigo",
+            arquivo_video=arquivo_original,
+            ordem=4,
+            ativo=True,
+        )
+
+        with open(video_path, "rb") as arquivo:
+            novo_video = SimpleUploadedFile(
+                "video_teste_novo.mp4",
+                arquivo.read(),
+                content_type="video/mp4",
+            )
+        serializer = LessonBlockSerializer(
+            instance=block,
+            data={
+                "tipo": LessonBlock.TIPO_VIDEO,
+                "titulo": "Vídeo atualizado",
+                "arquivo_video": novo_video,
+                "ordem": 4,
+                "ativo": True,
+            },
+            partial=True,
+        )
+
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        serializer.save()
+        block.refresh_from_db()
+        self.assertTrue(block.arquivo_video)
+        self.assertTrue(block.arquivo_video.name.endswith(".mp4"))
 
 
 class StudentSectionViewTests(TestCase):
