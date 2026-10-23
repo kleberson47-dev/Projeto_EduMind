@@ -145,7 +145,7 @@ export default function DetalhesSecaoProfessorPage() {
     setEditingBlock(null)
     setBlockForm({
       ...initialBlockForm,
-      ordem: blocks.length + 1,
+      ordem: Math.max(0, ...blocks.map((block) => block.ordem)) + 1,
     })
     setBlockFormError(null)
     setIsBlockFormOpen(true)
@@ -461,6 +461,13 @@ export default function DetalhesSecaoProfessorPage() {
                   </button>
                 </article>
               ))}
+
+              <article className="detalhes-secao-professor-empty-card">
+                <div aria-hidden="true">+</div>
+                <h3>Novo bloco</h3>
+                <p>Adicione outro bloco de conteúdo a esta seção.</p>
+                <button type="button" onClick={openBlockForm}>Criar bloco</button>
+              </article>
             </div>
           )}
         </section>

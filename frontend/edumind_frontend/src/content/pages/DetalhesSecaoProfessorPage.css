@@ -160,6 +160,11 @@
   margin-top: 20px;
 }
 
+.detalhes-secao-professor-block-list .detalhes-secao-professor-empty-card {
+  max-width: none;
+  margin-top: 0;
+}
+
 .detalhes-secao-professor-block-card {
   min-height: 190px;
   padding: 20px;
