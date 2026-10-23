@@ -15,11 +15,16 @@ import { ApiRequestError } from '../../utils/requests'
 
 import './DetalhesSecaoProfessorPage.css'
 
+type VideoSource = 'arquivo' | 'link'
+
 interface BlockFormState extends CreateLessonBlockRequest {
   tipo: LessonBlockType
   ordem: number
   ativo: boolean
   tabela_json: string
+  arquivo_imagem: File | null
+  arquivo_video: File | null
+  fonte_video: VideoSource
 }
 
 const initialBlockForm: BlockFormState = {
@@ -28,9 +33,20 @@ const initialBlockForm: BlockFormState = {
   conteudo: '',
   url_imagem: '',
   url_video: '',
+  arquivo_imagem: null,
+  arquivo_video: null,
+  fonte_video: 'arquivo',
   tabela_json: '',
   ordem: 1,
   ativo: true,
+}
+
+function getFileName(fileUrl: string | null) {
+  if (!fileUrl) {
+    return ''
+  }
+
+  return decodeURIComponent(fileUrl.split('/').pop() ?? '')
 }
 
 const blockTypeLabels: Record<LessonBlockType, string> = {
@@ -145,6 +161,9 @@ export default function DetalhesSecaoProfessorPage() {
       conteudo: block.conteudo,
       url_imagem: block.url_imagem,
       url_video: block.url_video,
+      arquivo_imagem: null,
+      arquivo_video: null,
+      fonte_video: block.url_video ? 'link' : 'arquivo',
       tabela_json: hasTableData ? JSON.stringify(block.tabela_json, null, 2) : '',
       ordem: block.ordem,
       ativo: block.ativo,
@@ -176,6 +195,26 @@ export default function DetalhesSecaoProfessorPage() {
     }))
   }
 
+  const handleBlockFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, files } = event.target
+    const file = files?.[0] ?? null
+
+    setBlockForm((currentForm) => ({
+      ...currentForm,
+      [name]: file,
+    }))
+  }
+
+  const handleVideoSourceChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    const fonteVideo = event.target.value as VideoSource
+
+    setBlockForm((currentForm) => ({
+      ...currentForm,
+      fonte_video: fonteVideo,
+      arquivo_video: fonteVideo === 'link' ? null : currentForm.arquivo_video,
+    }))
+  }
+
   const handleBlockStatusChange = (event: ChangeEvent<HTMLInputElement>) => {
     setBlockForm((currentForm) => ({
       ...currentForm,
@@ -197,8 +236,6 @@ export default function DetalhesSecaoProfessorPage() {
 
     const requiredFieldByType: Partial<Record<LessonBlockType, keyof BlockFormState>> = {
       texto: 'conteudo',
-      imagem: 'url_imagem',
-      video: 'url_video',
       tabela: 'tabela_json',
     }
     const requiredField = requiredFieldByType[blockForm.tipo]
@@ -206,6 +243,31 @@ export default function DetalhesSecaoProfessorPage() {
     if (requiredField && !String(blockForm[requiredField] ?? '').trim()) {
       setBlockFormError(`Informe o conteúdo obrigatório para o bloco de ${blockTypeLabels[blockForm.tipo].toLowerCase()}.`)
       return
+    }
+
+    if (
+      blockForm.tipo === 'imagem' &&
+      !blockForm.arquivo_imagem &&
+      !editingBlock?.arquivo_imagem
+    ) {
+      setBlockFormError('Selecione um arquivo de imagem para o bloco.')
+      return
+    }
+
+    if (blockForm.tipo === 'video') {
+      if (
+        blockForm.fonte_video === 'arquivo' &&
+        !blockForm.arquivo_video &&
+        !editingBlock?.arquivo_video
+      ) {
+        setBlockFormError('Selecione um arquivo de vídeo para o bloco.')
+        return
+      }
+
+      if (blockForm.fonte_video === 'link' && !blockForm.url_video?.trim()) {
+        setBlockFormError('Informe a URL do vídeo para o bloco.')
+        return
+      }
     }
 
     let tableData: unknown = undefined
@@ -247,12 +309,17 @@ export default function DetalhesSecaoProfessorPage() {
       setIsCreatingBlock(true)
       setBlockFormError(null)
 
+      const isVideoFile = blockForm.tipo === 'video' && blockForm.fonte_video === 'arquivo'
+
       const payload: CreateLessonBlockRequest = {
         tipo: blockForm.tipo,
         titulo: blockForm.titulo?.trim() ?? '',
         conteudo: blockForm.conteudo,
         url_imagem: blockForm.url_imagem,
-        url_video: blockForm.url_video,
+        // O backend rejeita arquivo e URL juntos no mesmo vídeo.
+        url_video: isVideoFile ? '' : blockForm.url_video,
+        arquivo_imagem: blockForm.tipo === 'imagem' ? blockForm.arquivo_imagem : null,
+        arquivo_video: isVideoFile ? blockForm.arquivo_video : null,
         tabela_json: tableData,
         ordem: blockForm.ordem,
         ativo: blockForm.ativo,
@@ -383,7 +450,7 @@ export default function DetalhesSecaoProfessorPage() {
                     {!block.ativo && <span>Inativo</span>}
                   </div>
                   <h3>{block.titulo || `Bloco de ${block.tipo}`}</h3>
-                  <p>{block.conteudo || block.url_imagem || block.url_video || 'Conteúdo em tabela ou lista.'}</p>
+                  <p>{block.conteudo || getFileName(block.arquivo_imagem) || getFileName(block.arquivo_video) || block.url_imagem || block.url_video || 'Conteúdo em tabela ou lista.'}</p>
                   <footer>Bloco {block.ordem}</footer>
                   <button
                     type="button"
@@ -438,16 +505,45 @@ export default function DetalhesSecaoProfessorPage() {
 
                 {blockForm.tipo === 'imagem' && (
                   <label>
-                    <span>URL da imagem</span>
-                    <input type="url" name="url_imagem" value={blockForm.url_imagem} onChange={handleBlockFieldChange} placeholder="https://" />
+                    <span>
+                      Arquivo da imagem
+                      {editingBlock?.arquivo_imagem && (
+                        <small> atual: {getFileName(editingBlock.arquivo_imagem)}</small>
+                      )}
+                    </span>
+                    <input type="file" name="arquivo_imagem" accept="image/*" onChange={handleBlockFileChange} />
                   </label>
                 )}
 
                 {blockForm.tipo === 'video' && (
-                  <label>
-                    <span>URL do vídeo</span>
-                    <input type="url" name="url_video" value={blockForm.url_video} onChange={handleBlockFieldChange} placeholder="https://" />
-                  </label>
+                  <>
+                    {!editingBlock?.arquivo_video && (
+                      <label>
+                        <span>Origem do vídeo</span>
+                        <select value={blockForm.fonte_video} onChange={handleVideoSourceChange}>
+                          <option value="arquivo">Enviar arquivo</option>
+                          <option value="link">Usar link</option>
+                        </select>
+                      </label>
+                    )}
+
+                    {blockForm.fonte_video === 'arquivo' ? (
+                      <label>
+                        <span>
+                          Arquivo do vídeo
+                          {editingBlock?.arquivo_video && (
+                            <small> atual: {getFileName(editingBlock.arquivo_video)}</small>
+                          )}
+                        </span>
+                        <input type="file" name="arquivo_video" accept="video/mp4,video/webm" onChange={handleBlockFileChange} />
+                      </label>
+                    ) : (
+                      <label>
+                        <span>URL do vídeo</span>
+                        <input type="url" name="url_video" value={blockForm.url_video} onChange={handleBlockFieldChange} placeholder="https://" />
+                      </label>
+                    )}
+                  </>
                 )}
 
                 {blockForm.tipo === 'tabela' && (

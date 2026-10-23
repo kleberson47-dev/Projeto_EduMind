@@ -112,6 +112,8 @@ export interface LessonBlock {
   conteudo: string
   url_imagem: string
   url_video: string
+  arquivo_imagem: string | null
+  arquivo_video: string | null
   tabela_json: unknown
   ordem: number
   ativo: boolean
@@ -177,6 +179,8 @@ export interface CreateLessonBlockRequest {
   conteudo?: string
   url_imagem?: string
   url_video?: string
+  arquivo_imagem?: File | null
+  arquivo_video?: File | null
   tabela_json?: unknown
   ordem?: number
   ativo?: boolean
@@ -188,6 +192,8 @@ export interface UpdateLessonBlockRequest {
   conteudo?: string
   url_imagem?: string
   url_video?: string
+  arquivo_imagem?: File | null
+  arquivo_video?: File | null
   tabela_json?: unknown
   ordem?: number
   ativo?: boolean

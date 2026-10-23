@@ -268,6 +268,34 @@ export async function getProfessorLessonBlocks(
   )
 }
 
+// Usa multipart apenas quando há arquivo; o navegador define o Content-Type com o boundary.
+function buildLessonBlockBody(
+  payload: CreateLessonBlockRequest | UpdateLessonBlockRequest,
+): CreateLessonBlockRequest | UpdateLessonBlockRequest | FormData {
+  const hasFile =
+    payload.arquivo_imagem instanceof File || payload.arquivo_video instanceof File
+
+  if (!hasFile) {
+    const { arquivo_imagem: _imagem, arquivo_video: _video, ...jsonPayload } = payload
+    return jsonPayload
+  }
+
+  const formData = new FormData()
+  Object.entries(payload).forEach(([key, value]) => {
+    if (value == null) {
+      return
+    }
+    if (value instanceof File) {
+      formData.append(key, value)
+    } else if (typeof value === 'object') {
+      formData.append(key, JSON.stringify(value))
+    } else {
+      formData.append(key, String(value))
+    }
+  })
+  return formData
+}
+
 export async function createLessonBlock(
   classroomId: number,
   lessonId: number,
@@ -277,7 +305,7 @@ export async function createLessonBlock(
 ): Promise<LessonBlock> {
   return requestJson<LessonBlock>(
     API_ENDPOINTS.classrooms.professorBlocks(classroomId, lessonId, sectionId),
-    { method: 'POST', body: payload, token },
+    { method: 'POST', body: buildLessonBlockBody(payload), token },
   )
 }
 
@@ -291,7 +319,7 @@ export async function updateLessonBlock(
 ): Promise<LessonBlock> {
   return requestJson<LessonBlock>(
     API_ENDPOINTS.classrooms.professorBlockDetail(classroomId, lessonId, sectionId, blockId),
-    { method: 'PATCH', body: payload, token },
+    { method: 'PATCH', body: buildLessonBlockBody(payload), token },
   )
 }
 
