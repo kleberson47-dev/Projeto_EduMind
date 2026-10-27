@@ -146,6 +146,45 @@ class ProfessorLessonViewTests(TestCase):
         self.assertEqual(lesson_1.ordem, 2)
         self.assertEqual(lesson_2.ordem, 1)
 
+    def test_professor_can_delete_lesson_and_reindex_remaining_lessons(self):
+        lesson_1 = Lesson.objects.create(
+            turma=self.classroom,
+            titulo="Aula 1",
+            descricao="Primeira aula.",
+            ordem=1,
+            ativo=True,
+        )
+        lesson_2 = Lesson.objects.create(
+            turma=self.classroom,
+            titulo="Aula 2",
+            descricao="Segunda aula.",
+            ordem=2,
+            ativo=True,
+        )
+        lesson_3 = Lesson.objects.create(
+            turma=self.classroom,
+            titulo="Aula 3",
+            descricao="Terceira aula.",
+            ordem=3,
+            ativo=True,
+        )
+
+        self.client.force_authenticate(user=self.professor)
+        url = reverse(
+            "classrooms-professor-lesson-detail",
+            args=[self.classroom.id, lesson_2.id],
+        )
+
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, 204)
+        self.assertFalse(Lesson.objects.filter(pk=lesson_2.id).exists())
+
+        lesson_1.refresh_from_db()
+        lesson_3.refresh_from_db()
+        self.assertEqual(lesson_1.ordem, 1)
+        self.assertEqual(lesson_3.ordem, 2)
+
 
 class StudentLessonViewTests(TestCase):
     def setUp(self):
@@ -640,6 +679,45 @@ class ProfessorLessonSectionViewTests(TestCase):
         self.assertEqual(section_1.ordem, 2)
         self.assertEqual(section_2.ordem, 1)
 
+    def test_professor_can_delete_section_and_reindex_remaining_sections(self):
+        section_1 = LessonSection.objects.create(
+            aula=self.lesson,
+            titulo="Seção 1",
+            descricao="Primeira seção.",
+            ordem=1,
+            ativo=True,
+        )
+        section_2 = LessonSection.objects.create(
+            aula=self.lesson,
+            titulo="Seção 2",
+            descricao="Segunda seção.",
+            ordem=2,
+            ativo=True,
+        )
+        section_3 = LessonSection.objects.create(
+            aula=self.lesson,
+            titulo="Seção 3",
+            descricao="Terceira seção.",
+            ordem=3,
+            ativo=True,
+        )
+
+        self.client.force_authenticate(user=self.professor)
+        url = reverse(
+            "classrooms-professor-section-detail",
+            args=[self.classroom.id, self.lesson.id, section_2.id],
+        )
+
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, 204)
+        self.assertFalse(LessonSection.objects.filter(pk=section_2.id).exists())
+
+        section_1.refresh_from_db()
+        section_3.refresh_from_db()
+        self.assertEqual(section_1.ordem, 1)
+        self.assertEqual(section_3.ordem, 2)
+
 
 class ProfessorLessonBlockViewTests(TestCase):
     def setUp(self):
@@ -728,3 +806,45 @@ class ProfessorLessonBlockViewTests(TestCase):
         self.assertEqual(response.data["titulo"], "Texto atualizado")
         self.assertEqual(response.data["conteudo"], "Conteúdo novo.")
         self.assertFalse(response.data["ativo"])
+
+    def test_professor_can_delete_block_and_reindex_remaining_blocks(self):
+        block_1 = LessonBlock.objects.create(
+            secao=self.section,
+            tipo=LessonBlock.TIPO_TEXTO,
+            titulo="Bloco 1",
+            conteudo="Primeiro bloco.",
+            ordem=1,
+            ativo=True,
+        )
+        block_2 = LessonBlock.objects.create(
+            secao=self.section,
+            tipo=LessonBlock.TIPO_TEXTO,
+            titulo="Bloco 2",
+            conteudo="Segundo bloco.",
+            ordem=2,
+            ativo=True,
+        )
+        block_3 = LessonBlock.objects.create(
+            secao=self.section,
+            tipo=LessonBlock.TIPO_TEXTO,
+            titulo="Bloco 3",
+            conteudo="Terceiro bloco.",
+            ordem=3,
+            ativo=True,
+        )
+
+        self.client.force_authenticate(user=self.professor)
+        url = reverse(
+            "classrooms-professor-block-detail",
+            args=[self.classroom.id, self.lesson.id, self.section.id, block_2.id],
+        )
+
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, 204)
+        self.assertFalse(LessonBlock.objects.filter(pk=block_2.id).exists())
+
+        block_1.refresh_from_db()
+        block_3.refresh_from_db()
+        self.assertEqual(block_1.ordem, 1)
+        self.assertEqual(block_3.ordem, 2)

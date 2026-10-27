@@ -7,6 +7,7 @@ import { getAccessToken } from '../../features/auth'
 import type { CreateLessonSectionRequest, LessonSection } from '../../models'
 import {
   createLessonSection,
+  deleteLessonSection,
   getProfessorLessonSections,
   updateLessonSection,
 } from '../../services'
@@ -107,6 +108,8 @@ export default function DetalhesAulaProfessorPage() {
     }
   }, [classroomId, lessonId])
 
+  const maxSectionOrder = editingSection ? sections.length : sections.length + 1
+
   const openSectionForm = () => {
     setEditingSection(null)
     setSectionForm({
@@ -173,6 +176,11 @@ export default function DetalhesAulaProfessorPage() {
 
     if (!sectionForm.ordem || sectionForm.ordem < 1) {
       setSectionFormError('A ordem da seção deve ser maior que zero.')
+      return
+    }
+
+    if (sectionForm.ordem > maxSectionOrder) {
+      setSectionFormError(`A ordem da seção não pode ultrapassar ${maxSectionOrder}.`)
       return
     }
 
@@ -256,6 +264,48 @@ export default function DetalhesAulaProfessorPage() {
     }
   }
 
+  const handleDeleteSection = async (section: LessonSection) => {
+    const confirmed = window.confirm(`Tem certeza que deseja excluir a seção "${section.titulo}"?`)
+
+    if (!confirmed) {
+      return
+    }
+
+    const parsedClassroomId = Number(classroomId)
+    const parsedLessonId = Number(lessonId)
+    const token = getAccessToken()
+
+    if (!Number.isInteger(parsedClassroomId) || parsedClassroomId <= 0) {
+      setErrorMessage('A turma informada é inválida.')
+      return
+    }
+
+    if (!Number.isInteger(parsedLessonId) || parsedLessonId <= 0) {
+      setErrorMessage('A aula informada é inválida.')
+      return
+    }
+
+    if (!token) {
+      setErrorMessage('Sua sessão expirou. Entre novamente para excluir a seção.')
+      return
+    }
+
+    try {
+      await deleteLessonSection(parsedClassroomId, parsedLessonId, section.id, token)
+      setSections((currentSections) => currentSections.filter((currentSection) => currentSection.id !== section.id))
+      saveTemporaryMessageAfterReload(
+        createTemporaryMessage('success', 'Seção excluída com sucesso.'),
+      )
+      window.location.reload()
+    } catch (error) {
+      const message = error instanceof ApiRequestError
+        ? error.message
+        : 'Não foi possível excluir a seção. Tente novamente.'
+      setErrorMessage(message)
+      setTemporaryMessage(createTemporaryMessage('error', message))
+    }
+  }
+
   useEffect(() => {
     if (!temporaryMessage) {
       return undefined
@@ -333,16 +383,26 @@ export default function DetalhesAulaProfessorPage() {
                   key={section.id}
                   className="detalhes-aula-professor-section-card"
                 >
+                  <div className="detalhes-aula-professor-section-card-heading">
+                    <span>Seção {section.ordem}</span>
+                    <div className="detalhes-aula-professor-section-card-meta">
+                      <span className={section.ativo ? 'detalhes-aula-professor-status' : 'detalhes-aula-professor-status inactive'}>
+                        {section.ativo ? 'Ativa' : 'Inativa'}
+                      </span>
+                      <button
+                        type="button"
+                        className="detalhes-aula-professor-delete-button"
+                        onClick={() => handleDeleteSection(section)}
+                        aria-label={`Excluir seção ${section.titulo}`}
+                      >
+                        Excluir
+                      </button>
+                    </div>
+                  </div>
                   <Link
                     to={`/app/turmas-professor/${classroomId}/aulas/${lessonId}/secoes/${section.id}`}
                     className="detalhes-aula-professor-section-card-link"
                   >
-                    <div className="detalhes-aula-professor-section-card-heading">
-                      <span>Seção {section.ordem}</span>
-                      <span className={section.ativo ? 'detalhes-aula-professor-status' : 'detalhes-aula-professor-status inactive'}>
-                        {section.ativo ? 'Ativa' : 'Inativa'}
-                      </span>
-                    </div>
                     <h3>{section.titulo}</h3>
                     <p>{section.descricao || 'Sem descrição cadastrada.'}</p>
                     <span className="detalhes-aula-professor-section-card-footer">
@@ -427,6 +487,7 @@ export default function DetalhesAulaProfessorPage() {
                     value={sectionForm.ordem ?? 1}
                     onChange={handleSectionFieldChange}
                     min="1"
+                    max={maxSectionOrder}
                   />
                 </label>
 

@@ -180,6 +180,19 @@
   gap: 7px;
 }
 
+.detalhes-secao-professor-block-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.detalhes-secao-professor-block-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
 .detalhes-secao-professor-block-card span {
   padding: 4px 8px;
   border-radius: 4px;
@@ -188,6 +201,23 @@
   font-size: 0.74rem;
   font-weight: 700;
   text-transform: capitalize;
+}
+
+.detalhes-secao-professor-delete-button {
+  padding: 5px 9px;
+  border: 1px solid #e7b3b3;
+  border-radius: 4px;
+  background: #fff5f5;
+  color: #b13f3f;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.detalhes-secao-professor-delete-button:hover {
+  background: #ffeaea;
+  color: #7f2323;
 }
 
 .detalhes-secao-professor-block-card h3 {
@@ -211,8 +241,14 @@
   font-weight: 700;
 }
 
-.detalhes-secao-professor-edit-button {
+.detalhes-secao-professor-block-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
   margin-top: 12px;
+}
+
+.detalhes-secao-professor-edit-button {
   padding: 0;
   border: 0;
   background: transparent;
@@ -226,6 +262,14 @@
 .detalhes-secao-professor-edit-button:hover {
   color: #105b99;
   text-decoration: underline;
+}
+
+.detalhes-secao-professor-delete-button {
+  color: #b13f3f;
+}
+
+.detalhes-secao-professor-delete-button:hover {
+  color: #7f2323;
 }
 
 .detalhes-secao-professor-footer {

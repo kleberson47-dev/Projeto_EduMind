@@ -183,9 +183,15 @@
   transform: translateY(-2px);
 }
 
+.detalhes-aula-professor-section-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+}
+
 .detalhes-aula-professor-edit-button {
   align-self: flex-start;
-  margin-top: 16px;
   padding: 0;
   border: 0;
   background: transparent;
@@ -201,6 +207,14 @@
   text-decoration: underline;
 }
 
+.detalhes-aula-professor-delete-button {
+  color: #b13f3f;
+}
+
+.detalhes-aula-professor-delete-button:hover {
+  color: #7f2323;
+}
+
 .detalhes-aula-professor-section-card-heading {
   display: flex;
   align-items: center;
@@ -211,12 +225,35 @@
   font-weight: 700;
 }
 
+.detalhes-aula-professor-section-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .detalhes-aula-professor-status {
   padding: 5px 8px;
   border-radius: 4px;
   background: #e7f7ef;
   color: #25734c;
   font-size: 0.76rem;
+}
+
+.detalhes-aula-professor-delete-button {
+  padding: 5px 9px;
+  border: 1px solid #e7b3b3;
+  border-radius: 4px;
+  background: #fff5f5;
+  color: #b13f3f;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.detalhes-aula-professor-delete-button:hover {
+  background: #ffeaea;
+  color: #7f2323;
 }
 
 .detalhes-aula-professor-status.inactive {

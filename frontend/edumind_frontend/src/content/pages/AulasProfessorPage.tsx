@@ -5,7 +5,12 @@ import { Link, useParams } from 'react-router-dom'
 import { ProfessorSidebar, TemporaryMessage } from '../../components'
 import { getAccessToken } from '../../features/auth'
 import type { CreateLessonRequest, Lesson } from '../../models'
-import { createLesson, getProfessorLessons, updateLesson } from '../../services'
+import {
+  createLesson,
+  deleteLesson,
+  getProfessorLessons,
+  updateLesson,
+} from '../../services'
 import {
   createTemporaryMessage,
   readTemporaryMessageAfterReload,
@@ -37,6 +42,8 @@ export default function AulasProfessorPage() {
   const [temporaryMessage, setTemporaryMessage] = useState<TemporaryMessageData | null>(
     () => readTemporaryMessageAfterReload(),
   )
+
+  const maxLessonOrder = editingLesson ? lessons.length : lessons.length + 1
 
   const openCreateForm = () => {
     setEditingLesson(null)
@@ -106,6 +113,11 @@ export default function AulasProfessorPage() {
       return
     }
 
+    if ((lessonForm.ordem ?? 0) > maxLessonOrder) {
+      setFormErrorMessage(`A ordem da aula não pode ultrapassar ${maxLessonOrder}.`)
+      return
+    }
+
     const parsedClassroomId = Number(classroomId)
     if (!Number.isInteger(parsedClassroomId) || parsedClassroomId <= 0) {
       setFormErrorMessage('A turma informada é inválida.')
@@ -161,6 +173,42 @@ export default function AulasProfessorPage() {
       setTemporaryMessage(createTemporaryMessage('error', message))
     } finally {
       setIsCreating(false)
+    }
+  }
+
+  const handleDeleteLesson = async (lesson: Lesson) => {
+    const confirmed = window.confirm(`Tem certeza que deseja excluir a aula "${lesson.titulo}"?`)
+
+    if (!confirmed) {
+      return
+    }
+
+    const parsedClassroomId = Number(classroomId)
+    const token = getAccessToken()
+
+    if (!Number.isInteger(parsedClassroomId) || parsedClassroomId <= 0) {
+      setErrorMessage('A turma informada é inválida.')
+      return
+    }
+
+    if (!token) {
+      setErrorMessage('Sua sessão expirou. Entre novamente para excluir a aula.')
+      return
+    }
+
+    try {
+      await deleteLesson(parsedClassroomId, lesson.id, token)
+      setLessons((currentLessons) => currentLessons.filter((currentLesson) => currentLesson.id !== lesson.id))
+      saveTemporaryMessageAfterReload(
+        createTemporaryMessage('success', 'Aula excluída com sucesso.'),
+      )
+      window.location.reload()
+    } catch (error) {
+      const message = error instanceof ApiRequestError
+        ? error.message
+        : 'Não foi possível excluir a aula. Tente novamente.'
+      setErrorMessage(message)
+      setTemporaryMessage(createTemporaryMessage('error', message))
     }
   }
 
@@ -278,9 +326,19 @@ export default function AulasProfessorPage() {
                 <article key={lesson.id} className="aula-professor-card">
                   <div className="aula-professor-card-banner">
                     <span>Aula {lesson.ordem}</span>
-                    <span className={lesson.ativo ? 'aula-professor-status' : 'aula-professor-status inactive'}>
-                      {lesson.ativo ? 'Ativa' : 'Inativa'}
-                    </span>
+                    <div className="aula-professor-card-meta">
+                      <span className={lesson.ativo ? 'aula-professor-status' : 'aula-professor-status inactive'}>
+                        {lesson.ativo ? 'Ativa' : 'Inativa'}
+                      </span>
+                      <button
+                        type="button"
+                        className="aula-professor-delete-button"
+                        onClick={() => handleDeleteLesson(lesson)}
+                        aria-label={`Excluir aula ${lesson.titulo}`}
+                      >
+                        Excluir
+                      </button>
+                    </div>
                   </div>
                   <div className="aula-professor-card-content">
                     <Link
@@ -381,6 +439,7 @@ export default function AulasProfessorPage() {
                     value={lessonForm.ordem}
                     onChange={handleFormChange}
                     min="1"
+                    max={maxLessonOrder}
                     step="1"
                   />
                 </label>

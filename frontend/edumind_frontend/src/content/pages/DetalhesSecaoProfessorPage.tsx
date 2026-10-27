@@ -5,7 +5,12 @@ import { Link, useParams } from 'react-router-dom'
 import { ProfessorSidebar, TemporaryMessage } from '../../components'
 import { getAccessToken } from '../../features/auth'
 import type { CreateLessonBlockRequest, LessonBlock, LessonBlockType } from '../../models'
-import { createLessonBlock, getProfessorLessonBlocks, updateLessonBlock } from '../../services'
+import {
+  createLessonBlock,
+  deleteLessonBlock,
+  getProfessorLessonBlocks,
+  updateLessonBlock,
+} from '../../services'
 import {
   createTemporaryMessage,
   readTemporaryMessageAfterReload,
@@ -143,6 +148,8 @@ export default function DetalhesSecaoProfessorPage() {
     }
   }, [classroomId, lessonId, sectionId])
 
+  const maxBlockOrder = editingBlock ? blocks.length : blocks.length + 1
+
   const openBlockForm = () => {
     setEditingBlock(null)
     setBlockForm({
@@ -233,6 +240,11 @@ export default function DetalhesSecaoProfessorPage() {
 
     if (!blockForm.ordem || blockForm.ordem < 1) {
       setBlockFormError('A ordem do bloco deve ser maior que zero.')
+      return
+    }
+
+    if (blockForm.ordem > maxBlockOrder) {
+      setBlockFormError(`A ordem do bloco não pode ultrapassar ${maxBlockOrder}.`)
       return
     }
 
@@ -381,6 +393,54 @@ export default function DetalhesSecaoProfessorPage() {
     }
   }
 
+  const handleDeleteBlock = async (block: LessonBlock) => {
+    const confirmed = window.confirm(`Tem certeza que deseja excluir o bloco "${block.titulo || `Bloco ${block.ordem}`}"?`)
+
+    if (!confirmed) {
+      return
+    }
+
+    const parsedClassroomId = Number(classroomId)
+    const parsedLessonId = Number(lessonId)
+    const parsedSectionId = Number(sectionId)
+    const token = getAccessToken()
+
+    if (!Number.isInteger(parsedClassroomId) || parsedClassroomId <= 0) {
+      setErrorMessage('A turma informada é inválida.')
+      return
+    }
+
+    if (!Number.isInteger(parsedLessonId) || parsedLessonId <= 0) {
+      setErrorMessage('A aula informada é inválida.')
+      return
+    }
+
+    if (!Number.isInteger(parsedSectionId) || parsedSectionId <= 0) {
+      setErrorMessage('A seção informada é inválida.')
+      return
+    }
+
+    if (!token) {
+      setErrorMessage('Sua sessão expirou. Entre novamente para excluir o bloco.')
+      return
+    }
+
+    try {
+      await deleteLessonBlock(parsedClassroomId, parsedLessonId, parsedSectionId, block.id, token)
+      setBlocks((currentBlocks) => currentBlocks.filter((currentBlock) => currentBlock.id !== block.id))
+      saveTemporaryMessageAfterReload(
+        createTemporaryMessage('success', 'Bloco excluído com sucesso.'),
+      )
+      window.location.reload()
+    } catch (error) {
+      const message = error instanceof ApiRequestError
+        ? error.message
+        : 'Não foi possível excluir o bloco. Tente novamente.'
+      setErrorMessage(message)
+      setTemporaryMessage(createTemporaryMessage('error', message))
+    }
+  }
+
   useEffect(() => {
     if (!temporaryMessage) {
       return undefined
@@ -450,9 +510,19 @@ export default function DetalhesSecaoProfessorPage() {
             <div className="detalhes-secao-professor-block-list">
               {blocks.map((block) => (
                 <article key={block.id} className="detalhes-secao-professor-block-card">
-                  <div>
-                    <span>{block.tipo}</span>
-                    {!block.ativo && <span>Inativo</span>}
+                  <div className="detalhes-secao-professor-block-card-header">
+                    <div className="detalhes-secao-professor-block-card-tags">
+                      <span>{block.tipo}</span>
+                      {!block.ativo && <span>Inativo</span>}
+                    </div>
+                    <button
+                      type="button"
+                      className="detalhes-secao-professor-delete-button"
+                      onClick={() => handleDeleteBlock(block)}
+                      aria-label={`Excluir bloco ${block.titulo || `Bloco ${block.ordem}`}`}
+                    >
+                      Excluir
+                    </button>
                   </div>
                   <h3>{block.titulo || `Bloco de ${block.tipo}`}</h3>
                   <p>{block.conteudo || getFileName(block.arquivo_imagem) || getFileName(block.arquivo_video) || block.url_imagem || block.url_video || 'Conteúdo em tabela ou lista.'}</p>
@@ -568,7 +638,14 @@ export default function DetalhesSecaoProfessorPage() {
                 <div className="detalhes-secao-professor-form-row">
                   <label>
                     <span>Ordem</span>
-                    <input type="number" name="ordem" min="1" value={blockForm.ordem} onChange={handleBlockFieldChange} />
+                    <input
+                      type="number"
+                      name="ordem"
+                      min="1"
+                      max={maxBlockOrder}
+                      value={blockForm.ordem}
+                      onChange={handleBlockFieldChange}
+                    />
                   </label>
                   <label className="detalhes-secao-professor-checkbox">
                     <input type="checkbox" checked={blockForm.ativo} onChange={handleBlockStatusChange} />

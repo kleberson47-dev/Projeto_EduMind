@@ -188,6 +188,17 @@ export async function updateLesson(
   )
 }
 
+export async function deleteLesson(
+  classroomId: number,
+  lessonId: number,
+  token: string,
+): Promise<void> {
+  return requestJson<void>(
+    API_ENDPOINTS.classrooms.professorLessonDetail(classroomId, lessonId),
+    { method: 'DELETE', token },
+  )
+}
+
 export async function getStudentLessons(
   classroomId: number,
   token: string,
@@ -242,6 +253,18 @@ export async function updateLessonSection(
   return requestJson<LessonSection>(
     API_ENDPOINTS.classrooms.professorSectionDetail(classroomId, lessonId, sectionId),
     { method: 'PATCH', body: payload, token },
+  )
+}
+
+export async function deleteLessonSection(
+  classroomId: number,
+  lessonId: number,
+  sectionId: number,
+  token: string,
+): Promise<void> {
+  return requestJson<void>(
+    API_ENDPOINTS.classrooms.professorSectionDetail(classroomId, lessonId, sectionId),
+    { method: 'DELETE', token },
   )
 }
 
@@ -320,6 +343,19 @@ export async function updateLessonBlock(
   return requestJson<LessonBlock>(
     API_ENDPOINTS.classrooms.professorBlockDetail(classroomId, lessonId, sectionId, blockId),
     { method: 'PATCH', body: buildLessonBlockBody(payload), token },
+  )
+}
+
+export async function deleteLessonBlock(
+  classroomId: number,
+  lessonId: number,
+  sectionId: number,
+  blockId: number,
+  token: string,
+): Promise<void> {
+  return requestJson<void>(
+    API_ENDPOINTS.classrooms.professorBlockDetail(classroomId, lessonId, sectionId, blockId),
+    { method: 'DELETE', token },
   )
 }
 

@@ -17,6 +17,9 @@ from ..serializers.lesson_serializers import (
     LessonSerializer,
 )
 from ..services import (
+    excluir_e_reindexar_aulas,
+    excluir_e_reindexar_blocos,
+    excluir_e_reindexar_secoes,
     listar_turmas_do_aluno,
     reordenar_aulas,
     reordenar_blocos,
@@ -206,7 +209,7 @@ class ProfessorClassroomLessonListCreateView(generics.ListCreateAPIView):
 
 
 # Exibe e atualiza uma aula pertencente ao professor logado.
-class ProfessorLessonDetailUpdateView(generics.RetrieveUpdateAPIView):
+class ProfessorLessonDetailUpdateView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = LessonSerializer
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = "id"
@@ -240,6 +243,20 @@ class ProfessorLessonDetailUpdateView(generics.RetrieveUpdateAPIView):
                 )
 
         return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        if getattr(request.user, "role", None) != "professor":
+            return Response(
+                {"detail": "Apenas professores podem excluir aulas."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        instance = self.get_object()
+        excluir_e_reindexar_aulas(
+            turma_id=self.kwargs.get("id"),
+            lesson_id=instance.id,
+        )
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 # Lista e cria seções de uma aula pertencente ao professor logado.
@@ -281,7 +298,7 @@ class ProfessorLessonSectionListCreateView(generics.ListCreateAPIView):
 
 
 # Exibe e atualiza uma seção pertencente ao professor logado.
-class ProfessorLessonSectionDetailUpdateView(generics.RetrieveUpdateAPIView):
+class ProfessorLessonSectionDetailUpdateView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = LessonSectionSerializer
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = "id"
@@ -316,6 +333,20 @@ class ProfessorLessonSectionDetailUpdateView(generics.RetrieveUpdateAPIView):
                 )
 
         return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        if getattr(request.user, "role", None) != "professor":
+            return Response(
+                {"detail": "Apenas professores podem excluir seções."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        instance = self.get_object()
+        excluir_e_reindexar_secoes(
+            aula_id=self.kwargs.get("lesson_id"),
+            section_id=instance.id,
+        )
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 # Lista e cria blocos de conteúdo dentro de uma seção pertencente ao professor logado.
@@ -359,7 +390,7 @@ class ProfessorLessonBlockListCreateView(generics.ListCreateAPIView):
 
 
 # Exibe e atualiza um bloco de conteúdo pertencente ao professor logado.
-class ProfessorLessonBlockDetailUpdateView(generics.RetrieveUpdateAPIView):
+class ProfessorLessonBlockDetailUpdateView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = LessonBlockSerializer
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = "id"
@@ -395,3 +426,17 @@ class ProfessorLessonBlockDetailUpdateView(generics.RetrieveUpdateAPIView):
                 )
 
         return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        if getattr(request.user, "role", None) != "professor":
+            return Response(
+                {"detail": "Apenas professores podem excluir blocos."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        instance = self.get_object()
+        excluir_e_reindexar_blocos(
+            secao_id=self.kwargs.get("section_id"),
+            block_id=instance.id,
+        )
+        return Response(status=status.HTTP_204_NO_CONTENT)

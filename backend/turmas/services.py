@@ -155,3 +155,69 @@ def reordenar_blocos(secao_id, block_id, nova_ordem):
     """Move um bloco para uma nova posição dentro da mesma seção."""
     queryset = LessonBlock.objects.filter(secao_id=secao_id).order_by("ordem")
     return _reordenar_itens_por_ordem(queryset, block_id, nova_ordem)
+
+
+def excluir_e_reindexar_aulas(turma_id, lesson_id):
+    """Remove uma aula e reordena as demais dentro da turma."""
+    queryset = Lesson.objects.filter(turma_id=turma_id).order_by("ordem")
+    instance = queryset.filter(pk=lesson_id).first()
+
+    if instance is None:
+        raise ValidationError("Aula não encontrada para exclusão.")
+
+    with transaction.atomic():
+        instance.delete()
+
+        for nova_ordem, lesson in enumerate(
+            Lesson.objects.filter(turma_id=turma_id).order_by("ordem"),
+            start=1,
+        ):
+            if lesson.ordem != nova_ordem:
+                lesson.ordem = nova_ordem
+                lesson.save(update_fields=["ordem"])
+
+    return instance
+
+
+def excluir_e_reindexar_secoes(aula_id, section_id):
+    """Remove uma seção e reordena as demais dentro da aula."""
+    queryset = LessonSection.objects.filter(aula_id=aula_id).order_by("ordem")
+    instance = queryset.filter(pk=section_id).first()
+
+    if instance is None:
+        raise ValidationError("Seção não encontrada para exclusão.")
+
+    with transaction.atomic():
+        instance.delete()
+
+        for nova_ordem, section in enumerate(
+            LessonSection.objects.filter(aula_id=aula_id).order_by("ordem"),
+            start=1,
+        ):
+            if section.ordem != nova_ordem:
+                section.ordem = nova_ordem
+                section.save(update_fields=["ordem"])
+
+    return instance
+
+
+def excluir_e_reindexar_blocos(secao_id, block_id):
+    """Remove um bloco e reordena os demais dentro da seção."""
+    queryset = LessonBlock.objects.filter(secao_id=secao_id).order_by("ordem")
+    instance = queryset.filter(pk=block_id).first()
+
+    if instance is None:
+        raise ValidationError("Bloco não encontrado para exclusão.")
+
+    with transaction.atomic():
+        instance.delete()
+
+        for nova_ordem, block in enumerate(
+            LessonBlock.objects.filter(secao_id=secao_id).order_by("ordem"),
+            start=1,
+        ):
+            if block.ordem != nova_ordem:
+                block.ordem = nova_ordem
+                block.save(update_fields=["ordem"])
+
+    return instance
