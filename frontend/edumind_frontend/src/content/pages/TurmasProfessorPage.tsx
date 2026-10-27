@@ -2,11 +2,19 @@ import { useEffect, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 
+import { ProfessorSidebar } from '../../components/ProfessorSidebar/ProfessorSidebar'
+import { TemporaryMessage } from '../../components'
 import { getAccessToken } from '../../features/auth'
 import type { Classroom, ClassroomDetail, CreateClassroomRequest } from '../../models'
-import { createClassroom, getProfessorClassrooms } from '../../services'
+import { createClassroom, deleteProfessorClassroom, getProfessorClassrooms } from '../../services'
+import {
+  createTemporaryMessage,
+  readTemporaryMessageAfterReload,
+  saveTemporaryMessageAfterReload,
+  TEMPORARY_MESSAGE_DURATION,
+  type TemporaryMessage as TemporaryMessageData,
+} from '../../utils'
 import { ApiRequestError } from '../../utils/requests'
-import { ProfessorSidebar } from '../../components/ProfessorSidebar/ProfessorSidebar'
 import './TurmasProfessorPage.css'
 
 type ClassroomColor = 'cyan' | 'blue' | 'yellow'
@@ -43,6 +51,9 @@ export default function TurmasProfessorPage() {
   const [classroomForm, setClassroomForm] = useState<CreateClassroomRequest>(initialClassroomForm)
   const [formErrorMessage, setFormErrorMessage] = useState<string | null>(null)
   const [isCreatingClassroom, setIsCreatingClassroom] = useState(false)
+  const [temporaryMessage, setTemporaryMessage] = useState<TemporaryMessageData | null>(
+    () => readTemporaryMessageAfterReload(),
+  )
 
   useEffect(() => {
     async function loadClassrooms() {
@@ -137,6 +148,51 @@ export default function TurmasProfessorPage() {
     }
   }
 
+  const handleDeleteClassroom = async (classroom: Classroom) => {
+    const confirmed = window.confirm(`Tem certeza que deseja excluir a turma "${classroom.nome}"?`)
+
+    if (!confirmed) {
+      return
+    }
+
+    const token = getAccessToken()
+    if (!token) {
+      setErrorMessage('Sua sessão expirou. Entre novamente para excluir a turma.')
+      return
+    }
+
+    try {
+      await deleteProfessorClassroom(classroom.id, token)
+      setClassrooms((currentClassrooms) => currentClassrooms.filter(
+        (currentClassroom) => currentClassroom.id !== classroom.id,
+      ))
+      saveTemporaryMessageAfterReload(
+        createTemporaryMessage('success', 'Turma excluída com sucesso.'),
+      )
+      window.location.reload()
+    } catch (error) {
+      const message = error instanceof ApiRequestError
+        ? error.message
+        : 'Não foi possível excluir a turma. Tente novamente.'
+      setErrorMessage(message)
+      setTemporaryMessage(createTemporaryMessage('error', message))
+    }
+  }
+
+  useEffect(() => {
+    if (!temporaryMessage) {
+      return undefined
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setTemporaryMessage(null)
+    }, TEMPORARY_MESSAGE_DURATION)
+
+    return () => {
+      window.clearTimeout(timeoutId)
+    }
+  }, [temporaryMessage])
+
   return (
     <div className="turmas-professor-layout">
       <ProfessorSidebar activeItem="turmas" />
@@ -150,6 +206,8 @@ export default function TurmasProfessorPage() {
           </p>
         </div>
       </header>
+
+      <TemporaryMessage message={temporaryMessage} />
 
       <section className="classroom-summary" aria-label="Resumo das turmas">
         <div className="summary-icon" aria-hidden="true">▦</div>
@@ -183,7 +241,17 @@ export default function TurmasProfessorPage() {
             <article key={classroom.id} className="classroom-card">
               <div className={`classroom-card-banner ${getClassroomColor(classroom.id)}`}>
                 <span className="classroom-card-symbol" aria-hidden="true">▣</span>
-                <span className="classroom-active-label">Ativa</span>
+                <div className="classroom-card-status-actions">
+                  <span className="classroom-active-label">{classroom.ativo ? 'Ativa' : 'Inativa'}</span>
+                  <button
+                    type="button"
+                    className="classroom-delete-button"
+                    onClick={() => handleDeleteClassroom(classroom)}
+                    aria-label={`Excluir turma ${classroom.nome}`}
+                  >
+                    Excluir
+                  </button>
+                </div>
               </div>
 
               <div className="classroom-card-content">

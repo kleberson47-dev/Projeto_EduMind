@@ -140,6 +140,46 @@ class GradeSerializerTests(TestCase):
         self.assertEqual(serializer.data["atividade"], self.activity.id)
 
 
+class ProfessorClassroomDeleteTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.professor = User.objects.create_user(
+            email="professor_delete_turma@teste.com",
+            password="12345678",
+            nome="Professor Deletar Turma",
+            role="professor",
+        )
+        self.student = User.objects.create_user(
+            email="aluno_delete_turma@teste.com",
+            password="12345678",
+            nome="Aluno Deletar Turma",
+            role="aluno",
+        )
+        self.classroom = Classroom.objects.create(
+            professor=self.professor,
+            nome="Turma para deletar",
+            descricao="Turma de teste para exclusão.",
+            codigo_acesso="DEL12345",
+            criterios_avaliacao="Avaliação de teste.",
+            regras="Regra de teste.",
+            ativo=True,
+        )
+        Enrollment.objects.create(
+            aluno=self.student,
+            turma=self.classroom,
+            ativo=True,
+        )
+
+    def test_professor_can_delete_classroom(self):
+        self.client.force_authenticate(user=self.professor)
+        url = reverse("classrooms-professor-detail", args=[self.classroom.id])
+
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, 204)
+        self.assertFalse(Classroom.objects.filter(id=self.classroom.id).exists())
+
+
 class ClassroomActivityViewTests(TestCase):
     def setUp(self):
         self.client = APIClient()

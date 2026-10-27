@@ -90,6 +90,16 @@ export async function updateProfessorClassroom(
   )
 }
 
+export async function deleteProfessorClassroom(
+  classroomId: number,
+  token: string,
+): Promise<void> {
+  return requestJson<void>(
+    API_ENDPOINTS.classrooms.professorDetail(classroomId),
+    { method: 'DELETE', token },
+  )
+}
+
 export async function getProfessorActivities(
   classroomId: number,
   token: string,

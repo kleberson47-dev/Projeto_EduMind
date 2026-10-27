@@ -55,8 +55,8 @@ class ProfessorClassroomListCreateView(generics.ListCreateAPIView):
         return super().post(request, *args, **kwargs)
 
 
-# Exibe e atualiza os dados básicos de uma turma específica pertencente ao professor.
-class ProfessorClassroomDetailView(generics.RetrieveUpdateAPIView):
+# Exibe, atualiza e exclui os dados básicos de uma turma específica pertencente ao professor.
+class ProfessorClassroomDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = "id"
 
@@ -77,6 +77,17 @@ class ProfessorClassroomDetailView(generics.RetrieveUpdateAPIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
         return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        if getattr(request.user, "role", None) != "professor":
+            return Response(
+                {"detail": "Apenas professores podem excluir turmas."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        instance = self.get_object()
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 # Lista e cria atividades de uma turma pertencente ao professor logado.

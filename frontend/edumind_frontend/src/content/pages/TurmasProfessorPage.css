@@ -189,6 +189,12 @@
   font-size: 1.75rem;
 }
 
+.classroom-card-status-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .classroom-active-label {
   padding: 5px 8px;
   border-radius: 5px;
@@ -196,6 +202,23 @@
   color: #355570;
   font-size: 0.73rem;
   font-weight: 700;
+}
+
+.classroom-delete-button {
+  padding: 5px 10px;
+  border: 0;
+  border-radius: 5px;
+  background: #d93d3d;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  transition: filter 0.2s ease;
+}
+
+.classroom-delete-button:hover {
+  filter: brightness(0.96);
 }
 
 .classroom-card-content {
