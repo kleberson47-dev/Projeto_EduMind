@@ -12,6 +12,8 @@ import {
 } from '../../services'
 import {
   createTemporaryMessage,
+  readTemporaryMessageAfterReload,
+  saveTemporaryMessageAfterReload,
   TEMPORARY_MESSAGE_DURATION,
   type TemporaryMessage as TemporaryMessageData,
 } from '../../utils'
@@ -40,7 +42,7 @@ export default function DetalhesAulaProfessorPage() {
   const [sectionFormError, setSectionFormError] = useState<string | null>(null)
   const [isCreatingSection, setIsCreatingSection] = useState(false)
   const [temporaryMessage, setTemporaryMessage] =
-    useState<TemporaryMessageData | null>(null)
+    useState<TemporaryMessageData | null>(() => readTemporaryMessageAfterReload())
 
   useEffect(() => {
     const parsedClassroomId = Number(classroomId)
@@ -214,9 +216,12 @@ export default function DetalhesAulaProfessorPage() {
         setSections((currentSections) => currentSections
           .map((section) => section.id === updatedSection.id ? updatedSection : section)
           .sort((firstSection, secondSection) => firstSection.ordem - secondSection.ordem))
-        setTemporaryMessage(
-          createTemporaryMessage('success', 'Seção atualizada com sucesso.'),
-        )
+        if (payload.ordem !== undefined && payload.ordem !== editingSection.ordem) {
+          saveTemporaryMessageAfterReload(
+            createTemporaryMessage('success', 'Seção atualizada com sucesso.'),
+          )
+          window.location.reload()
+        }
       } else {
         const createdSection = await createLessonSection(
           parsedClassroomId,

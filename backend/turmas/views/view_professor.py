@@ -16,7 +16,12 @@ from ..serializers.lesson_serializers import (
     LessonSectionSerializer,
     LessonSerializer,
 )
-from ..services import listar_turmas_do_aluno
+from ..services import (
+    listar_turmas_do_aluno,
+    reordenar_aulas,
+    reordenar_blocos,
+    reordenar_secoes,
+)
 
 
 # Lista as turmas do professor e também permite criar uma nova turma.
@@ -215,6 +220,27 @@ class ProfessorLessonDetailUpdateView(generics.RetrieveUpdateAPIView):
             turma__professor=self.request.user,
         )
 
+    def update(self, request, *args, **kwargs):
+        if "ordem" in request.data:
+            instance = self.get_object()
+            nova_ordem = request.data.get("ordem")
+            try:
+                nova_ordem = int(nova_ordem)
+            except (TypeError, ValueError):
+                return Response(
+                    {"detail": "A ordem informada é inválida."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            if nova_ordem != instance.ordem:
+                reordenar_aulas(
+                    turma_id=self.kwargs.get("id"),
+                    lesson_id=instance.id,
+                    nova_ordem=nova_ordem,
+                )
+
+        return super().update(request, *args, **kwargs)
+
 
 # Lista e cria seções de uma aula pertencente ao professor logado.
 class ProfessorLessonSectionListCreateView(generics.ListCreateAPIView):
@@ -269,6 +295,27 @@ class ProfessorLessonSectionDetailUpdateView(generics.RetrieveUpdateAPIView):
             aula__turma_id=self.kwargs.get("id"),
             aula__turma__professor=self.request.user,
         )
+
+    def update(self, request, *args, **kwargs):
+        if "ordem" in request.data:
+            instance = self.get_object()
+            nova_ordem = request.data.get("ordem")
+            try:
+                nova_ordem = int(nova_ordem)
+            except (TypeError, ValueError):
+                return Response(
+                    {"detail": "A ordem informada é inválida."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            if nova_ordem != instance.ordem:
+                reordenar_secoes(
+                    aula_id=self.kwargs.get("lesson_id"),
+                    section_id=instance.id,
+                    nova_ordem=nova_ordem,
+                )
+
+        return super().update(request, *args, **kwargs)
 
 
 # Lista e cria blocos de conteúdo dentro de uma seção pertencente ao professor logado.
@@ -327,3 +374,24 @@ class ProfessorLessonBlockDetailUpdateView(generics.RetrieveUpdateAPIView):
             secao__aula__turma_id=self.kwargs.get("id"),
             secao__aula__turma__professor=self.request.user,
         )
+
+    def update(self, request, *args, **kwargs):
+        if "ordem" in request.data:
+            instance = self.get_object()
+            nova_ordem = request.data.get("ordem")
+            try:
+                nova_ordem = int(nova_ordem)
+            except (TypeError, ValueError):
+                return Response(
+                    {"detail": "A ordem informada é inválida."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            if nova_ordem != instance.ordem:
+                reordenar_blocos(
+                    secao_id=self.kwargs.get("section_id"),
+                    block_id=instance.id,
+                    nova_ordem=nova_ordem,
+                )
+
+        return super().update(request, *args, **kwargs)

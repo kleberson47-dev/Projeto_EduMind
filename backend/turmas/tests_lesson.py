@@ -116,6 +116,36 @@ class ProfessorLessonViewTests(TestCase):
         self.assertEqual(response.data["ordem"], 2)
         self.assertFalse(response.data["ativo"])
 
+    def test_professor_can_reorder_lessons_for_classroom(self):
+        lesson_1 = Lesson.objects.create(
+            turma=self.classroom,
+            titulo="Aula 1",
+            descricao="Primeira aula.",
+            ordem=1,
+            ativo=True,
+        )
+        lesson_2 = Lesson.objects.create(
+            turma=self.classroom,
+            titulo="Aula 2",
+            descricao="Segunda aula.",
+            ordem=2,
+            ativo=True,
+        )
+
+        self.client.force_authenticate(user=self.professor)
+        url = reverse(
+            "classrooms-professor-lesson-detail",
+            args=[self.classroom.id, lesson_2.id],
+        )
+
+        response = self.client.patch(url, {"ordem": 1}, format="json")
+
+        self.assertEqual(response.status_code, 200)
+        lesson_1.refresh_from_db()
+        lesson_2.refresh_from_db()
+        self.assertEqual(lesson_1.ordem, 2)
+        self.assertEqual(lesson_2.ordem, 1)
+
 
 class StudentLessonViewTests(TestCase):
     def setUp(self):
@@ -579,6 +609,36 @@ class ProfessorLessonSectionViewTests(TestCase):
         self.assertEqual(response.data["titulo"], "Seção atualizada")
         self.assertEqual(response.data["descricao"], "Descrição nova.")
         self.assertFalse(response.data["ativo"])
+
+    def test_professor_can_reorder_sections_for_lesson(self):
+        section_1 = LessonSection.objects.create(
+            aula=self.lesson,
+            titulo="Seção 1",
+            descricao="Primeira seção.",
+            ordem=1,
+            ativo=True,
+        )
+        section_2 = LessonSection.objects.create(
+            aula=self.lesson,
+            titulo="Seção 2",
+            descricao="Segunda seção.",
+            ordem=2,
+            ativo=True,
+        )
+
+        self.client.force_authenticate(user=self.professor)
+        url = reverse(
+            "classrooms-professor-section-detail",
+            args=[self.classroom.id, self.lesson.id, section_2.id],
+        )
+
+        response = self.client.patch(url, {"ordem": 1}, format="json")
+
+        self.assertEqual(response.status_code, 200)
+        section_1.refresh_from_db()
+        section_2.refresh_from_db()
+        self.assertEqual(section_1.ordem, 2)
+        self.assertEqual(section_2.ordem, 1)
 
 
 class ProfessorLessonBlockViewTests(TestCase):

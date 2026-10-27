@@ -2,8 +2,9 @@ import random
 import string
 
 from django.core.exceptions import ValidationError
+from django.db import transaction
 
-from .models import Classroom, Enrollment
+from .models import Classroom, Enrollment, Lesson, LessonBlock, LessonSection
 
 
 def gerar_codigo_acesso(tamanho=8):
@@ -96,3 +97,61 @@ def criar_turma_para_professor(professor, nome, descricao="", criterios_avaliaca
     )
 
     return turma
+
+
+def _reordenar_itens_por_ordem(queryset, item_id, nova_ordem):
+    """Reordena itens de um mesmo nível sem duplicar a ordem dentro do grupo."""
+    itens = list(queryset.order_by("ordem"))
+
+    if not itens:
+        raise ValidationError("Não há itens para reordenar.")
+
+    item_encontrado = None
+    indice_item = None
+
+    for indice, item in enumerate(itens):
+        if item.pk == item_id:
+            item_encontrado = item
+            indice_item = indice
+            break
+
+    if item_encontrado is None:
+        raise ValidationError("Item não encontrado para reordenar.")
+
+    if nova_ordem is None or nova_ordem < 1:
+        raise ValidationError("A nova ordem deve ser um número maior que zero.")
+
+    ordem_final = min(int(nova_ordem), len(itens))
+    itens_sem_item = [item for item in itens if item.pk != item_id]
+    itens_reordenados = itens_sem_item[:]
+    itens_reordenados.insert(ordem_final - 1, item_encontrado)
+
+    with transaction.atomic():
+        temp_base = max((item.ordem for item in itens), default=0) + 1000
+        for indice, item in enumerate(itens):
+            item.ordem = temp_base + indice + 1
+            item.save(update_fields=["ordem"])
+
+        for indice, item in enumerate(itens_reordenados, start=1):
+            item.ordem = indice
+            item.save(update_fields=["ordem"])
+
+    return itens_reordenados
+
+
+def reordenar_aulas(turma_id, lesson_id, nova_ordem):
+    """Move uma aula para uma nova posição dentro da mesma turma."""
+    queryset = Lesson.objects.filter(turma_id=turma_id).order_by("ordem")
+    return _reordenar_itens_por_ordem(queryset, lesson_id, nova_ordem)
+
+
+def reordenar_secoes(aula_id, section_id, nova_ordem):
+    """Move uma seção para uma nova posição dentro da mesma aula."""
+    queryset = LessonSection.objects.filter(aula_id=aula_id).order_by("ordem")
+    return _reordenar_itens_por_ordem(queryset, section_id, nova_ordem)
+
+
+def reordenar_blocos(secao_id, block_id, nova_ordem):
+    """Move um bloco para uma nova posição dentro da mesma seção."""
+    queryset = LessonBlock.objects.filter(secao_id=secao_id).order_by("ordem")
+    return _reordenar_itens_por_ordem(queryset, block_id, nova_ordem)

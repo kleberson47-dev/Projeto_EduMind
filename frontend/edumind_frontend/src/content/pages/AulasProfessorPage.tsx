@@ -8,6 +8,8 @@ import type { CreateLessonRequest, Lesson } from '../../models'
 import { createLesson, getProfessorLessons, updateLesson } from '../../services'
 import {
   createTemporaryMessage,
+  readTemporaryMessageAfterReload,
+  saveTemporaryMessageAfterReload,
   TEMPORARY_MESSAGE_DURATION,
   type TemporaryMessage as TemporaryMessageData,
 } from '../../utils'
@@ -32,7 +34,9 @@ export default function AulasProfessorPage() {
   const [lessonForm, setLessonForm] = useState<CreateLessonRequest>(initialLessonForm)
   const [formErrorMessage, setFormErrorMessage] = useState<string | null>(null)
   const [isCreating, setIsCreating] = useState(false)
-  const [temporaryMessage, setTemporaryMessage] = useState<TemporaryMessageData | null>(null)
+  const [temporaryMessage, setTemporaryMessage] = useState<TemporaryMessageData | null>(
+    () => readTemporaryMessageAfterReload(),
+  )
 
   const openCreateForm = () => {
     setEditingLesson(null)
@@ -131,7 +135,12 @@ export default function AulasProfessorPage() {
         setLessons((currentLessons) => currentLessons
           .map((lesson) => lesson.id === updatedLesson.id ? updatedLesson : lesson)
           .sort((firstLesson, secondLesson) => firstLesson.ordem - secondLesson.ordem))
-        setTemporaryMessage(createTemporaryMessage('success', 'Aula atualizada com sucesso.'))
+        if (payload.ordem !== undefined && payload.ordem !== editingLesson.ordem) {
+          saveTemporaryMessageAfterReload(
+            createTemporaryMessage('success', 'Aula atualizada com sucesso.'),
+          )
+          window.location.reload()
+        }
       } else {
         const createdLesson = await createLesson(parsedClassroomId, payload, token)
 

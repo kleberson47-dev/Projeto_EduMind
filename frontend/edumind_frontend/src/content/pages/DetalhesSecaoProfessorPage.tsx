@@ -8,6 +8,8 @@ import type { CreateLessonBlockRequest, LessonBlock, LessonBlockType } from '../
 import { createLessonBlock, getProfessorLessonBlocks, updateLessonBlock } from '../../services'
 import {
   createTemporaryMessage,
+  readTemporaryMessageAfterReload,
+  saveTemporaryMessageAfterReload,
   TEMPORARY_MESSAGE_DURATION,
   type TemporaryMessage as TemporaryMessageData,
 } from '../../utils'
@@ -68,7 +70,7 @@ export default function DetalhesSecaoProfessorPage() {
   const [blockFormError, setBlockFormError] = useState<string | null>(null)
   const [isCreatingBlock, setIsCreatingBlock] = useState(false)
   const [temporaryMessage, setTemporaryMessage] =
-    useState<TemporaryMessageData | null>(null)
+    useState<TemporaryMessageData | null>(() => readTemporaryMessageAfterReload())
 
   useEffect(() => {
     const parsedClassroomId = Number(classroomId)
@@ -338,9 +340,12 @@ export default function DetalhesSecaoProfessorPage() {
         setBlocks((currentBlocks) => currentBlocks
           .map((block) => block.id === updatedBlock.id ? updatedBlock : block)
           .sort((firstBlock, secondBlock) => firstBlock.ordem - secondBlock.ordem))
-        setTemporaryMessage(
-          createTemporaryMessage('success', 'Bloco atualizado com sucesso.'),
-        )
+        if (payload.ordem !== undefined && payload.ordem !== editingBlock.ordem) {
+          saveTemporaryMessageAfterReload(
+            createTemporaryMessage('success', 'Bloco atualizado com sucesso.'),
+          )
+          window.location.reload()
+        }
       } else {
         const createdBlock = await createLessonBlock(
           parsedClassroomId,
