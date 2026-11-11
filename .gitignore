@@ -7,6 +7,7 @@ backend/env.bak/
 backend/venv.bak/
 backend/accounts/tests.py
 backend/media/
+backend/private_media/
 teste.png
 video_teste.mp4
 
