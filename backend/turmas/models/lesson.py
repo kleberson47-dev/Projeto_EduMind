@@ -2,6 +2,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 from .classroom import Classroom
+from .module import Module
 
 
 # Representa uma aula dentro de uma turma, com ordenação para o conteúdo didático.
@@ -10,6 +11,13 @@ class Lesson(models.Model):
         Classroom,
         on_delete=models.CASCADE,
         related_name="aulas",
+    )
+    modulo = models.ForeignKey(
+        Module,
+        on_delete=models.SET_NULL,
+        related_name="aulas",
+        blank=True,
+        null=True,
     )
     titulo = models.CharField(max_length=255)
     descricao = models.TextField(blank=True, default="")
@@ -34,6 +42,9 @@ class Lesson(models.Model):
     def clean(self):
         if not self.titulo:
             raise ValidationError("Título da aula é obrigatório.")
+
+        if self.modulo_id and self.modulo.turma_id != self.turma_id:
+            raise ValidationError("O módulo não pertence a esta turma.")
 
 
 # Representa uma seção dentro de uma aula para separar blocos de conteúdo.
