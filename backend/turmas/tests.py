@@ -1,9 +1,11 @@
+from decimal import Decimal
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
 
-from .models import Activity, Classroom, Enrollment, Grade
+from .models import Activity, Classroom, Enrollment, Grade, Module
 from .serializers.activity_serializers import ActivitySerializer
 from .serializers.grade_serializers import GradeSerializer
 
@@ -68,11 +70,19 @@ class ActivitySerializerTests(TestCase):
             regras="Regra de teste.",
             ativo=True,
         )
+        self.module = Module.objects.create(
+            turma=self.classroom,
+            nome="Unidade 1",
+            ordem=1,
+            modo_distribuicao=Module.DISTRIBUICAO_LIVRE,
+        )
         self.activity = Activity.objects.create(
             turma=self.classroom,
+            modulo=self.module,
             titulo="Atividade 1",
             descricao="Descreva sua resposta.",
-            tipo="atividade",
+            tipo=Activity.TIPO_TRABALHO,
+            peso=Decimal("10.00"),
             data_entrega="2026-09-15",
             ativo=True,
         )
@@ -81,8 +91,12 @@ class ActivitySerializerTests(TestCase):
         serializer = ActivitySerializer(instance=self.activity)
 
         self.assertEqual(serializer.data["titulo"], "Atividade 1")
-        self.assertEqual(serializer.data["tipo"], "atividade")
+        self.assertEqual(serializer.data["tipo"], "trabalho")
         self.assertEqual(serializer.data["turma"], self.classroom.id)
+        self.assertEqual(serializer.data["modulo"], self.module.id)
+        self.assertEqual(serializer.data["peso"], "10.00")
+        self.assertEqual(serializer.data["pontuada"], True)
+        self.assertEqual(serializer.data["publicado"], False)
         self.assertEqual(serializer.data["ativo"], True)
 
 
@@ -114,11 +128,19 @@ class GradeSerializerTests(TestCase):
             turma=self.classroom,
             ativo=True,
         )
+        self.module = Module.objects.create(
+            turma=self.classroom,
+            nome="Unidade 1",
+            ordem=1,
+            modo_distribuicao=Module.DISTRIBUICAO_LIVRE,
+        )
         self.activity = Activity.objects.create(
             turma=self.classroom,
+            modulo=self.module,
             titulo="Atividade de nota",
             descricao="Entregar a resposta.",
-            tipo="atividade",
+            tipo=Activity.TIPO_TRABALHO,
+            peso=Decimal("10.00"),
             data_entrega="2026-09-25",
             ativo=True,
         )
@@ -209,12 +231,21 @@ class ClassroomActivityViewTests(TestCase):
             turma=self.classroom,
             ativo=True,
         )
+        self.module = Module.objects.create(
+            turma=self.classroom,
+            nome="Unidade 1",
+            ordem=1,
+            modo_distribuicao=Module.DISTRIBUICAO_LIVRE,
+        )
         self.activity = Activity.objects.create(
             turma=self.classroom,
+            modulo=self.module,
             titulo="Atividade inicial",
             descricao="Entregar no prazo.",
-            tipo="atividade",
+            tipo=Activity.TIPO_TRABALHO,
+            peso=Decimal("4.00"),
             data_entrega="2026-09-20",
+            publicado=True,
             ativo=True,
         )
 
@@ -226,17 +257,20 @@ class ClassroomActivityViewTests(TestCase):
         response = self.client.post(
             url,
             {
+                "modulo": self.module.id,
                 "titulo": "Nova atividade",
                 "descricao": "Fazer os exercícios.",
-                "tipo": "atividade",
+                "tipo": "trabalho",
+                "peso": "5",
                 "data_entrega": "2026-09-25",
             },
             format="json",
         )
 
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, 201, response.content)
         self.assertEqual(response.data["titulo"], "Nova atividade")
         self.assertEqual(response.data["turma"], self.classroom.id)
+        self.assertEqual(response.data["peso"], "5.00")
 
     def test_student_can_list_activities_for_classroom(self):
         self.client.force_authenticate(user=self.student)
@@ -279,11 +313,19 @@ class ClassroomGradeViewTests(TestCase):
             turma=self.classroom,
             ativo=True,
         )
+        self.module = Module.objects.create(
+            turma=self.classroom,
+            nome="Unidade 1",
+            ordem=1,
+            modo_distribuicao=Module.DISTRIBUICAO_LIVRE,
+        )
         self.activity = Activity.objects.create(
             turma=self.classroom,
+            modulo=self.module,
             titulo="Prova 1",
             descricao="Prova do módulo.",
-            tipo="prova",
+            tipo=Activity.TIPO_PROVA,
+            peso=Decimal("10.00"),
             data_entrega="2026-09-30",
             ativo=True,
         )

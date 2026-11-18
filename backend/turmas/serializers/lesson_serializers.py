@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from ..models import Lesson, LessonBlock, LessonSection
+from .common_serializers import ModuloDaTurmaField
 
 
 MAX_SIZE_IMAGEM = 5 * 1024 * 1024
@@ -174,12 +175,14 @@ class LessonSectionSerializer(serializers.ModelSerializer):
 # Serializa a aula completa, incluindo suas seções e blocos.
 class LessonSerializer(serializers.ModelSerializer):
     secoes = LessonSectionSerializer(many=True, read_only=True)
+    modulo = ModuloDaTurmaField(required=False, allow_null=True)
 
     class Meta:
         model = Lesson
         fields = [
             "id",
             "turma",
+            "modulo",
             "titulo",
             "descricao",
             "ordem",

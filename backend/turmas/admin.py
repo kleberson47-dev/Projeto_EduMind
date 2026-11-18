@@ -1,6 +1,18 @@
 from django.contrib import admin
 
-from .models import Activity, ClassroomMaterial, Grade, Module
+from .models import Activity, ActivityQuestion, ClassroomMaterial, Grade, Module, Question
+
+
+@admin.register(Question)
+class QuestionAdmin(admin.ModelAdmin):
+    list_display = ("enunciado", "modulo", "dificuldade", "no_banco", "ativo")
+    list_filter = ("dificuldade", "no_banco", "ativo")
+    search_fields = ("enunciado", "modulo__nome")
+
+
+@admin.register(ActivityQuestion)
+class ActivityQuestionAdmin(admin.ModelAdmin):
+    list_display = ("atividade", "questao", "ordem")
 
 
 @admin.register(Module)

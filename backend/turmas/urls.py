@@ -7,12 +7,21 @@ from .views import (
     AlunoClassroomLessonDetailView,
     AlunoClassroomLessonListView,
     AlunoClassroomListView,
+    AlunoClassroomMaterialListView,
     AlunoLessonBlockListView,
     AlunoLessonSectionListView,
+    ClassroomMaterialDownloadView,
     JoinClassroomView,
+    ProfessorClassroomActivityDetailView,
     ProfessorClassroomActivityListCreateView,
+    ProfessorClassroomActivityPublishView,
     ProfessorClassroomDetailView,
     ProfessorClassroomGradeListCreateView,
+    ProfessorClassroomMaterialDetailView,
+    ProfessorClassroomMaterialListCreateView,
+    ProfessorClassroomModuleDetailView,
+    ProfessorClassroomModuleDistributionView,
+    ProfessorClassroomModuleListCreateView,
     ProfessorLessonDetailUpdateView,
     ProfessorClassroomLessonListCreateView,
     ProfessorClassroomListCreateView,
@@ -37,12 +46,39 @@ urlpatterns = [
     # Detalha e atualiza uma turma pertencente ao professor logado.
     path("classrooms/professor/<int:id>/",
          ProfessorClassroomDetailView.as_view(), name="classrooms-professor-detail"),
+    # Lista e cria módulos (unidades) de uma turma do professor.
+    path("classrooms/<int:id>/modules/",
+         ProfessorClassroomModuleListCreateView.as_view(), name="classrooms-professor-modules"),
+    # Detalha, renomeia e desativa um módulo específico.
+    path("classrooms/<int:id>/modules/<int:module_id>/",
+         ProfessorClassroomModuleDetailView.as_view(), name="classrooms-professor-module-detail"),
+    # Define, uma única vez, o critério de distribuição de pontos do módulo.
+    path("classrooms/<int:id>/modules/<int:module_id>/distribution/",
+         ProfessorClassroomModuleDistributionView.as_view(), name="classrooms-professor-module-distribution"),
     # Lista e cria atividades da turma do professor.
     path("classrooms/<int:id>/activities/",
          ProfessorClassroomActivityListCreateView.as_view(), name="classrooms-professor-activities"),
-    # Lista as atividades visíveis ao aluno dentro da turma.
+    # Lista as atividades publicadas e liberadas ao aluno dentro da turma.
     path("classrooms/<int:id>/activities/student/",
          AlunoClassroomActivityListView.as_view(), name="classrooms-student-activities"),
+    # Detalha, atualiza e remove (ou desativa) uma atividade do professor.
+    path("classrooms/<int:id>/activities/<int:activity_id>/",
+         ProfessorClassroomActivityDetailView.as_view(), name="classrooms-professor-activity-detail"),
+    # Publica uma atividade para os alunos.
+    path("classrooms/<int:id>/activities/<int:activity_id>/publish/",
+         ProfessorClassroomActivityPublishView.as_view(), name="classrooms-professor-activity-publish"),
+    # Lista e cadastra materiais complementares da turma do professor.
+    path("classrooms/<int:id>/materials/",
+         ProfessorClassroomMaterialListCreateView.as_view(), name="classrooms-professor-materials"),
+    # Lista os materiais complementares disponíveis ao aluno.
+    path("classrooms/<int:id>/materials/student/",
+         AlunoClassroomMaterialListView.as_view(), name="classrooms-student-materials"),
+    # Detalha, atualiza e remove um material do professor.
+    path("classrooms/<int:id>/materials/<int:material_id>/",
+         ProfessorClassroomMaterialDetailView.as_view(), name="classrooms-professor-material-detail"),
+    # Baixa o arquivo privado do material (professor dono da turma ou aluno matriculado).
+    path("classrooms/<int:id>/materials/<int:material_id>/download/",
+         ClassroomMaterialDownloadView.as_view(), name="classrooms-material-download"),
     # Lista e cria aulas de uma turma do professor.
     path("classrooms/<int:id>/lessons/",
          ProfessorClassroomLessonListCreateView.as_view(), name="classrooms-professor-lessons"),

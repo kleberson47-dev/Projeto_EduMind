@@ -5,12 +5,13 @@ from .view_aluno import (
     AlunoClassroomLessonDetailView,
     AlunoClassroomLessonListView,
     AlunoClassroomListView,
+    AlunoClassroomMaterialListView,
     AlunoLessonBlockListView,
     AlunoLessonSectionListView,
+    ClassroomMaterialDownloadView,
     JoinClassroomView,
 )
 from .view_professor import (
-    ProfessorClassroomActivityListCreateView,
     ProfessorClassroomDetailView,
     ProfessorClassroomGradeListCreateView,
     ProfessorLessonDetailUpdateView,
@@ -21,6 +22,16 @@ from .view_professor import (
     ProfessorLessonSectionDetailUpdateView,
     ProfessorLessonSectionListCreateView,
 )
+from .view_professor_atividades import (
+    ProfessorClassroomActivityDetailView,
+    ProfessorClassroomActivityListCreateView,
+    ProfessorClassroomActivityPublishView,
+    ProfessorClassroomMaterialDetailView,
+    ProfessorClassroomMaterialListCreateView,
+    ProfessorClassroomModuleDetailView,
+    ProfessorClassroomModuleDistributionView,
+    ProfessorClassroomModuleListCreateView,
+)
 
 __all__ = [
     "AlunoClassroomActivityListView",
@@ -29,12 +40,21 @@ __all__ = [
     "AlunoClassroomLessonDetailView",
     "AlunoClassroomLessonListView",
     "AlunoClassroomListView",
+    "AlunoClassroomMaterialListView",
     "AlunoLessonBlockListView",
     "AlunoLessonSectionListView",
+    "ClassroomMaterialDownloadView",
     "JoinClassroomView",
+    "ProfessorClassroomActivityDetailView",
     "ProfessorClassroomActivityListCreateView",
+    "ProfessorClassroomActivityPublishView",
     "ProfessorClassroomDetailView",
     "ProfessorClassroomGradeListCreateView",
+    "ProfessorClassroomMaterialDetailView",
+    "ProfessorClassroomMaterialListCreateView",
+    "ProfessorClassroomModuleDetailView",
+    "ProfessorClassroomModuleDistributionView",
+    "ProfessorClassroomModuleListCreateView",
     "ProfessorLessonDetailUpdateView",
     "ProfessorClassroomLessonListCreateView",
     "ProfessorClassroomListCreateView",

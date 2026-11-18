@@ -38,8 +38,10 @@ class GradeSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         turma = self.context.get("turma")
-        aluno = attrs.get("aluno")
-        atividade = attrs.get("atividade")
+        aluno = attrs.get("aluno", getattr(self.instance, "aluno", None))
+        atividade = attrs.get(
+            "atividade", getattr(self.instance, "atividade", None))
+        valor = attrs.get("valor", getattr(self.instance, "valor", None))
 
         if turma is None:
             raise serializers.ValidationError("Turma não informada.")
@@ -49,23 +51,39 @@ class GradeSerializer(serializers.ModelSerializer):
                 "Aluno não está matriculado na turma."
             )
 
-        if atividade is not None and atividade.turma_id != turma.id:
-            raise serializers.ValidationError(
-                "A atividade não pertence a esta turma."
-            )
+        if atividade is not None:
+            if atividade.turma_id != turma.id:
+                raise serializers.ValidationError(
+                    "A atividade não pertence a esta turma."
+                )
 
-        if (
-            aluno is not None
-            and atividade is not None
-            and Grade.objects.filter(
+            if not atividade.ativo or not atividade.pontuada:
+                raise serializers.ValidationError(
+                    "Apenas atividades ativas e pontuadas recebem nota."
+                )
+
+            if (
+                valor is not None
+                and atividade.peso is not None
+                and valor > atividade.peso
+            ):
+                raise serializers.ValidationError(
+                    {"valor": f"A nota não pode ser maior que o peso da atividade ({atividade.peso})."}
+                )
+
+        if aluno is not None and atividade is not None:
+            duplicadas = Grade.objects.filter(
                 aluno=aluno,
                 turma=turma,
                 atividade=atividade,
-            ).exists()
-        ):
-            raise serializers.ValidationError(
-                "Já existe uma nota registrada para essa atividade deste aluno."
             )
+            if self.instance is not None:
+                duplicadas = duplicadas.exclude(pk=self.instance.pk)
+
+            if duplicadas.exists():
+                raise serializers.ValidationError(
+                    "Já existe uma nota registrada para essa atividade deste aluno."
+                )
 
         return attrs
 
